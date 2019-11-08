@@ -42,7 +42,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="std" docName="draft-huque-dnsop-ns-revalidation-00" ipr="trust200902">
+<rfc category="std" docName="draft-huque-dnsop-ns-revalidation-01" ipr="trust200902">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN"
@@ -51,7 +51,7 @@
   <!-- ***** FRONT MATTER ***** -->
 
   <front>
-    <title abbrev="Delegation Revalidation">
+    <title abbrev="DNS Delegation Revalidation">
 	Delegation Revalidation by DNS Resolvers
     </title>
 
@@ -108,6 +108,11 @@
   <middle>
 
     <section title="Introduction" anchor="intro">
+      <t>
+        RFC EDITOR: PLEASE REMOVE THE FOLLOWING PARAGRAPH BEFORE
+        PUBLISHING: The source for this draft is maintained in GitHub
+        at: https://github.com/shuque/ns-revalidation
+      </t>
       <t>
 	This document recommends improved DNS resolver behavior with
 	respect to the processing of NS record sets during iterative
@@ -172,9 +177,10 @@
 	place the authoritative NS RRset preferentially in their cache is
 	that the TTLs may differ between the parent and child side of the
 	zone cut. Some DNS Top Level Domains (TLDs) only support long fixed
-	TTLs in their delegation NS sets, and this inhibits the zone owner's
-	ability to make more rapid changes to their nameserver configuration,
-	if resolvers have no systematic mechanism to observe the child NS RRset.
+	TTLs in their delegation NS sets, and this inhibits a child zone
+        owner's ability to make more rapid changes to their nameserver
+        configuration using a shorter TTL, if resolvers have no systematic
+        mechanism to observe and cache the child NS RRset.
       </t>
 
       <t>
@@ -187,14 +193,20 @@
 	re-delegated elsewhere. This leads to the second recommendation
 	in this document, "Delegation Revalidation". Essentially, the
 	resolver should record the TTL of the parent's delegating NS
-	RRset, and use it to trigger a revalidation action. Technically,
-	if both parent and child zone are DNSSEC <xref target="RFC4033" />
+	RRset, and use it to trigger a revalidation action.
+      </t>
+      <t>
+	If both parent and child zone are DNSSEC <xref target="RFC4033" />
 	<xref target="RFC4034" /> <xref target="RFC4035" /> signed with a
 	corresponding secure delegation between them, then expiration
-	of the DS record will cause revalidation of the current child
-	zone's DNSKEY set, so responses from the orphaned child nameservers
+	of the Delegation Signer (DS) record set will cause revalidation of
+	the current child zone's DNSKEY set. According to RFC 4035, Section
+	2.4, "The TTL of a DS RRSet SHOULD match the TTL of the delegating
+	NS RRset", so this revalidation should be triggered on the same
+	time scale, and thus responses from the stale child nameservers
 	would no longer be trusted. However, delegation revalidation is
-	still necessary to locate the current nameserver addresses.
+	still necessary to locate the current nameserver addresses to which
+	subsequent DNS queries should be directed.
       </t>
 
     </section>
@@ -210,7 +222,11 @@
 	   the triggering query to the delegated nameservers for the newly
 	   discovered zone cut. The response to the triggering query
 	   should be delayed until both the forwarded query and the validation
-	   query have been answered.
+	   query have been answered. Note that validating resolvers today,
+	   when following a secure delegation response, already need to
+	   dispatch a query to the delegated nameservers for the DNSKEY RRset,
+	   so this validation query could also be sent in parallel with that
+	   DNSKEY query.
 	</t>
 
 	<t>
@@ -235,8 +251,11 @@
 	   [TBD: There are a small but non trivial number of authoritative
 	   DNS services that timeout on explicit NS queries. Should we
 	   accommodate them by treating this practice lazily and
-	   opportunistically? Or do we expect the DNS Flag Day efforts will
-	   effectively banish them in the near future?]
+	   opportunistically? Some implementers may be hesitant to delay
+           responses to the triggering query until the validation query
+           has been processed if it incurs a timeout associated delay. Or
+           do we expect the DNS Flag Day efforts will effectively banish
+           these broken authoritative servers and render this concern moot?]
 	</t>
 
       </list>
@@ -334,9 +353,8 @@
 	<xref target="upgrade-ns">Upgrading NS RRset Credibility</xref>
 	allows resolvers to cache and utilize the authoritative child
 	apex NS RRset in preference to the non-authoriative parent NS
-	RRset. However, it is very important to implement the
-	steps described in <xref target="revalidation">Delegation
-	Revalidation</xref> at
+	RRset. However, it is important to implement the steps described in
+        <xref target="revalidation">Delegation Revalidation</xref> at
 	the expiration of the parent's delegating TTL. Otherwise, the
 	operator of a malicious child zone, originally delegated to, but
 	subsequently delegated away from, can cause resolvers that refresh
