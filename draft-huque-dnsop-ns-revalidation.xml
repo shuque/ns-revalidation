@@ -11,7 +11,6 @@
 <!ENTITY RFC4033 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.4033.xml">
 <!ENTITY RFC4034 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.4034.xml">
 <!ENTITY RFC4035 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.4035.xml">
-<!ENTITY RFC7816 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.7816.xml">
 <!ENTITY I-D.narten-iana-considerations-rfc2434bis SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.narten-iana-considerations-rfc2434bis.xml">
 <!ENTITY I-D.vixie-dnsext-resimprove SYSTEM
 "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.vixie-dnsext-resimprove.xml">
@@ -150,26 +149,14 @@
 	it is possible for an iterative caching resolver to never learn the
 	authoritative NS RRset for a zone, unless a downstream client of the
 	resolver explicitly issues such an NS query, which is not something
-	that normal enduser applications do.
+	that normal enduser applications do, and thus cannot be relied upon
+        to occur with any kind of regularity.
       </t>
 
       <t>
 	Increasingly, there is a trend towards minimizing unnecessary data
 	in DNS responses. Several popular DNS implementations default to such
 	a configuration (see "minimal-responses" in BIND and Unbound).
-      </t>
-
-      <t>
-	<xref target="RFC7816">Qname Minimisation</xref>, a more privacy
-	preserving mode of iterative resolution, specifies the use of the
-	NS query type at every step of the resolution process until the
-	full query name has been reconstructed at the leaf zone. This would
-	provide a way to definitively learn the child zone's authoritative
-	NS RRset. In practice however, many (most?) implementations of Qname
-	Minimisation currently employ the original query type or the A
-	query type. Thus, regardless of whether Qname Minimisation is in
-	use or not, this document recommends explicitly fetching the
-	authoritative NS RRset at the child zone when following a referral.
       </t>
 
       <t>
@@ -372,7 +359,6 @@
       &RFC1034;
       &RFC1035;
       &RFC2181;
-      &RFC7816;
     </references>
 
     <references title="Informative References">
