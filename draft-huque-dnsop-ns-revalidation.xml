@@ -14,6 +14,8 @@
 <!ENTITY I-D.narten-iana-considerations-rfc2434bis SYSTEM "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.narten-iana-considerations-rfc2434bis.xml">
 <!ENTITY I-D.vixie-dnsext-resimprove SYSTEM
 "http://xml.resource.org/public/rfc/bibxml3/reference.I-D.vixie-dnsext-resimprove.xml">
+<!ENTITY I-D.wijngaards-dnsext-resolver-mitigation SYSTEM
+"https://xml.resource.org/public/rfc/bibxml3/reference.I-D.wijngaards-dnsext-resolver-side-mitigation.xml">
 ]>
 
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
@@ -325,7 +327,10 @@
 
     <section anchor="Acknowledgements" title="Acknowledgements">
       <t>
-	The practices described in this document were originally proposed
+        Wouter Wijngaards proposed explicitly obtaining authoritative child
+        NS data in <xref target="I-D.wijngaards-dnsext-resolver-side-mitigation"/>. This behavior has been implemented in the Unbound DNS resolver via the
+        "harden-referral-path" option. The combination of child NS fetch and
+        revalidating the child delegation was originally proposed
 	in <xref target="I-D.vixie-dnsext-resimprove"/>, by Vixie, Joffe,
 	and Neves.
       </t>
@@ -366,6 +371,7 @@
       &RFC4034;
       &RFC4035;
       &I-D.vixie-dnsext-resimprove;
+      &I-D.wijngaards-dnsext-resolver-mitigation;
     </references>
   </back>
 
