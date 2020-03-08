@@ -72,7 +72,15 @@
       </address>
     </author>
 
-    <date month="November" year="2019" />
+    <author fullname="Ralph Dolmans" initials="R." surname="Dolmans">
+      <organization>NLnet Labs</organization>
+      <address>
+	<email>ralph@nlnetlabs.nl</email>
+	<!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>
+
+    <date month="March" year="2020" />
 
     <!-- Meta-data Declarations -->
 
@@ -86,8 +94,9 @@
     <keyword>Authoritative</keyword>
     <keyword>Name Server Record</keyword>
     <keyword>NS</keyword>
+    <keyword>Parent</keyword>
+    <keyword>Child</keyword>
     <keyword>Resource Record Set</keyword>
-    <keyword>Qname Minimisation</keyword>
 
     <abstract>
       <t>
@@ -152,13 +161,15 @@
 	authoritative NS RRset for a zone, unless a downstream client of the
 	resolver explicitly issues such an NS query, which is not something
 	that normal enduser applications do, and thus cannot be relied upon
-        to occur with any kind of regularity.
+        to occur with any regularity.
       </t>
 
       <t>
 	Increasingly, there is a trend towards minimizing unnecessary data
 	in DNS responses. Several popular DNS implementations default to such
-	a configuration (see "minimal-responses" in BIND and Unbound).
+	a configuration (see "minimal-responses" in BIND and Unbound). So,
+        they may never include the authoritative NS RRset in the Authority
+        section of their responses.
       </t>
 
       <t>
@@ -209,16 +220,14 @@
 	   When a delegation response is received during iteration, a
 	   validation query should be sent in parallel with the forwarding of
 	   the triggering query to the delegated nameservers for the newly
-	   discovered zone cut. The response to the triggering query
-	   should be delayed until both the forwarded query and the validation
-	   query have been answered. Note that validating resolvers today,
+	   discovered zone cut. Note that validating resolvers today,
 	   when following a secure delegation response, already need to
 	   dispatch a query to the delegated nameservers for the DNSKEY RRset,
-	   so this validation query could also be sent in parallel with that
+	   so this validation query could be sent in parallel with that
 	   DNSKEY query.
 	</t>
 
-	<t>
+      	<t>
 	   A validation query consists of a query for the child's apex NS
 	   RRset, sent to the newly discovered delegation's nameservers. Normal
 	   iterative logic applies to the processing of responses to validation
@@ -228,23 +237,23 @@
 	</t>
 
 	<t>
+	   Some resolvers may choose to delay the response to the triggering
+           query until both the forwarded query and the validation query have
+           been answered. In practice, we expect many implementations may
+           answer the forwarded query in advance of the validation query for
+           performance reasons. An additiotional reason is that there are number
+           of nameservers in the field that (incorrectly) do not answer explicit
+           queries for NS records, and thus the revalidation logic may need to
+           be applied lazily and opportunistically to deal with them.
+	</t>
+
+	<t>
 	   If there are no nameserver names in common between the child's
 	   apex NS RRset and the parent's delegation NS RRset, then the
 	   responses received from forwarding the triggering query to the
 	   parent's delegated nameservers should be discarded after validation,
 	   and this query should be forwarded again to the child's apex
 	   nameservers.
-	</t>
-
-	<t>
-	   [TBD: There are a small but non trivial number of authoritative
-	   DNS services that timeout on explicit NS queries. Should we
-	   accommodate them by treating this practice lazily and
-	   opportunistically? Some implementers may be hesitant to delay
-           responses to the triggering query until the validation query
-           has been processed if it incurs a timeout associated delay. Or
-           do we expect the DNS Flag Day efforts will effectively banish
-           these broken authoritative servers and render this concern moot?]
 	</t>
 
       </list>
@@ -304,20 +313,14 @@
 	</t>
 
 	<t>
-	   To make the timing of a revalidation event unpredictable from
-	   the point of view of a potential cache-spoof attacker, the parent's
-	   delegating NS RRset TTL should be reduced by a random fraction of its
-	   value before being stored for use in revalidation activities.
-	</t>
-
-	<t>
-	   This section describes a precise algorithm for delegation
+	   The text above describes a detailed algorithm for delegation
 	   revalidation. A simpler resolver implementation may choose
-	   alternative methods, e.g. it may choose to perform the upward
-	   search for expired delegations at scheduled intervals rather
-	   than for every response decision. Or it may have a fixed maximum
-	   TTL for child zones before they are expired from the cache and
-	   requeried at the parent.
+	   alternative methods. For example, if the child NS TTL is lower
+           than the parent, revalidation will naturally occur at the
+           expiration of the child NS TTL, and no specific changes to the
+           resolution algorithm need to be implemented. If the child NS
+           TTL is larger than the parent, then the resolver will invoke
+           revalidation actions at the expiration of the parent NS TTL.
 	</t>
 
       </list>
