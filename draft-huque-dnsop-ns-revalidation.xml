@@ -219,8 +219,8 @@
 	     query, this sound very much pre-qname minimisation -->
 	<t>
 	   When a delegation response is received during iteration, a
-	   validation query should be sent in parallel with the forwarding of
-	   the triggering query to the delegated nameservers for the newly
+	   validation query should be sent in parallel with the resolution of
+	   the triggering query, to the delegated nameservers for the newly
 	   discovered zone cut. Note that validating resolvers today,
 	   when following a secure delegation response, already need to
 	   dispatch a query to the delegated nameservers for the DNSKEY RRset,
@@ -237,7 +237,7 @@
 	   validation query will be cached with an authoritative data ranking.
 	   Successive queries directed to the same zone will be directed to the
 	   nameservers listed in the child's apex, due to the ranking of this
-	   answer. If the validation query fails the parent NS RRset will remain
+	   answer. If the validation query fails, the parent NS RRset will remain
 	   the one with the highest ranking and will be used for successive
 	   queries.
 	</t>
@@ -247,11 +247,11 @@
 
 	<t>
 	   Some resolvers may choose to delay the response to the triggering
-           query until both the forwarded query and the validation query have
+           query until both the triggering query and the validation query have
            been answered. In practice, we expect many implementations may
-           answer the forwarded query in advance of the validation query for
+           answer the triggering query in advance of the validation query for
            performance reasons. An additional reason is that there are number
-           of nameservers in the field that (incorrectly) do not answer explicit
+           of nameservers in the field that (incorrectly) fail to answer explicit
            queries for NS records, and thus the revalidation logic may need to
            be applied lazily and opportunistically to deal with them.
 	</t>
@@ -274,9 +274,14 @@
     <section title="Delegation Revalidation" anchor="revalidation">
 
       <t>
-        This documents proposes two mechanism to perform delegation
-	revalidation: an extensive and a simple mechanism. The extensive
-	mechanism:
+        This documents proposes two mechanisms to perform delegation
+	revalidation: an extensive and a simple mechanism. [TODO: in
+        the next revision of this draft, we would prefer to discard the
+        extensive mechanism description and keep only the simple one,
+        assuming agreement.]
+      </t>
+
+      <t>The extensive mechanism:
 
       <list style="symbols">
 
@@ -329,28 +334,11 @@
       The simple mechanism:
       <list style="symbols">
 	<t>
-	   Limit the time to cache the child NS RRset to the TTL of the parent
-	   NS RRset. Revalidation will naturally occur at the expiration
-	   of the child NS TTL, and no specific changes to the resolution
-	   algorithm need to be implemented.
-	   <list style="symbols">
-	      <t>
-		      If the TTL of the child NS RRset is lower than the parent
-		      TTL, the parent NS RRset is the only NS RRset still
-		      available in cache after expiration of the child, and will
-		      be used to forward the triggering query to.  After this an
-		      validation query to upgrade the NS RRset credibility will
-		      be send.
-	      </t>
-	      <t>
-		      If the TTL of the child NS RRset is equal to or greater
-		      than the TTL of the parent NS RRset, neither of them will
-		      be used after the expiration of the record with the capped
-		      TTL and normal iteration will happen to resolve the
-		      record, including the query to upgrade the NS RRset
-		      credibility.
-	      </t>
-	   </list>
+	   Cap the time to cache the child NS RRset to the lower of child
+           and parent NS RRset TTL. The normal iterative resolution algorithm
+           will then cause delegation revalidation to naturally occur at the
+           expiration of the capped child NS TTL, along with dispatching of
+           the validation query to upgrade NS RRset credibility.
 	</t>
       </list></t>
 
