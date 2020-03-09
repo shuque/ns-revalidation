@@ -237,7 +237,9 @@
 	   validation query will be cached with an authoritative data ranking.
 	   Successive queries directed to the same zone will be directed to the
 	   nameservers listed in the child's apex, due to the ranking of this
-	   answer.
+	   answer. If the validation query fails the parent NS RRset will remain
+	   the one with the highest ranking and will be used for successive
+	   queries.
 	</t>
 
 	<!-- Ralph: fwiw, I'm ok with completely dropping the next items. Let's
