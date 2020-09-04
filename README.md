@@ -6,5 +6,5 @@ This document recommends improved DNS [RFC1034] [RFC1035] resolver behavior with
 
 Rendered versions of the current document can be found at the following links:
 
-* [HTML] (https://www.huque.com/ietf/ns-revalidation/draft-huque-dnsop-ns-revalidation.html)
-* [TEXT] (https://www.huque.com/ietf/ns-revalidation/draft-huque-dnsop-ns-revalidation.txt)
+* [HTML] (https://www.huque.com/ietf/ns-revalidation/draft-ietf-dnsop-ns-revalidation.html)
+* [TEXT] (https://www.huque.com/ietf/ns-revalidation/draft-ietf-dnsop-ns-revalidation.txt)
