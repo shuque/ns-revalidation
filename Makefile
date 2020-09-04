@@ -1,5 +1,5 @@
 SOURCE  = \
-	draft-huque-dnsop-ns-revalidation
+	draft-ietf-dnsop-ns-revalidation
 
 all:	$(SOURCE).txt $(SOURCE).html
 
