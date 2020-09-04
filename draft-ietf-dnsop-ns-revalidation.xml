@@ -1,24 +1,9 @@
-<?xml version="1.0" encoding="US-ASCII"?>
-<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
-<!-- One method to get references from the online citation libraries.
-     There has to be one entity for each item to be referenced.
-     An alternate method (rfc include) is described in the references. -->
+<?xml version='1.0' encoding='utf-8'?>
 
-<!ENTITY RFC1034 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.1034.xml">
-<!ENTITY RFC1035 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.1035.xml">
-<!ENTITY RFC2181 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2181.xml">
-<!ENTITY RFC3552 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3552.xml">
-<!ENTITY RFC4033 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml">
-<!ENTITY RFC4034 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4034.xml">
-<!ENTITY RFC4035 SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4035.xml">
-<!ENTITY I-D.narten-iana-considerations-rfc2434bis SYSTEM "http://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.narten-iana-considerations-rfc2434bis.xml">
-<!ENTITY I-D.vixie-dnsext-resimprove SYSTEM
-"http://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.vixie-dnsext-resimprove.xml">
-<!ENTITY I-D.wijngaards-dnsext-resolver-mitigation SYSTEM
-"https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.wijngaards-dnsext-resolver-side-mitigation.xml">
-]>
+<!DOCTYPE rfc SYSTEM "rfc2629-xhtml.ent">
 
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+
 <!-- used by XSLT processors -->
 <!-- For a complete list and description of processing instructions (PIs),
      please see http://xml.resource.org/authoring/README.html. -->
@@ -43,45 +28,46 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="std" docName="draft-ietf-dnsop-ns-revalidation-00" ipr="trust200902">
-  <!-- category values: std, bcp, info, exp, and historic
-     ipr values: full3667, noModification3667, noDerivatives3667
-     you can add the attributes updates="NNNN" and obsoletes="NNNN"
-     they will automatically be output with "(if approved)" -->
+
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude"
+        category="std" consensus="true"
+        docName="draft-ietf-dnsop-ns-revalidation-00"
+        ipr="trust200902" obsoletes="" updates=""
+        submissionType="IETF" xml:lang="en"
+        tocInclude="true" tocDepth="4"
+        symRefs="true" sortRefs="true" version="3">
 
   <!-- ***** FRONT MATTER ***** -->
 
   <front>
+
     <title abbrev="DNS Delegation Revalidation">
 	Delegation Revalidation by DNS Resolvers
     </title>
-
+    <seriesInfo name="Internet-Draft"
+        value="draft-ietf-dnsop-ns-revalidation-00"/>
     <author fullname="Shumon Huque" initials="S." surname="Huque">
       <organization>Salesforce</organization>
       <address>
-	<email>shuque@gmail.com</email>
-	<!-- uri and facsimile elements may also be added -->
+        <email>shuque@gmail.com</email>
+        <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
-
     <author fullname="Paul Vixie" initials="P." surname="Vixie">
       <organization>Farsight Security</organization>
       <address>
-	<email>paul@redbarn.org</email>
-	<!-- uri and facsimile elements may also be added -->
+        <email>paul@redbarn.org</email>
+        <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
-
     <author fullname="Ralph Dolmans" initials="R." surname="Dolmans">
       <organization>NLnet Labs</organization>
       <address>
-	<email>ralph@nlnetlabs.nl</email>
-	<!-- uri and facsimile elements may also be added -->
+        <email>ralph@nlnetlabs.nl</email>
+        <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
-
-    <date month="March" year="2020" />
-
+    <date month="September" year="2020"/>
     <!-- Meta-data Declarations -->
 
     <area>General</area>
@@ -97,11 +83,10 @@
     <keyword>Parent</keyword>
     <keyword>Child</keyword>
     <keyword>Resource Record Set</keyword>
-
     <abstract>
       <t>
-	This document recommends improved DNS <xref target="RFC1034"/>
-	<xref target="RFC1035"/> resolver behavior with
+	This document recommends improved DNS <xref target="RFC1034" format="default"/>
+        <xref target="RFC1035" format="default"/> resolver behavior with
 	respect to the processing of Name Server (NS) resource record
 	sets (RRset) during iterative resolution. When following a referral
 	response from an authoritative server to a child zone, DNS resolvers
@@ -113,11 +98,9 @@
       </t>
     </abstract>
   </front>
-
-
   <middle>
-
-    <section title="Introduction" anchor="intro">
+    <section anchor="intro" numbered="true" toc="default">
+      <name>Introduction</name>
       <t>
         RFC EDITOR: PLEASE REMOVE THE FOLLOWING PARAGRAPH BEFORE
         PUBLISHING: The source for this draft is maintained in GitHub
@@ -136,20 +119,19 @@
 	NS RRset.
       </t>
     </section>
-
-    <section title="Motivation" anchor="motivation">
-
+    <section anchor="motivation" numbered="true" toc="default">
+      <name>Motivation</name>
       <t>
 	The delegation NS RRset at the bottom of the parent zone and the
 	apex NS RRset in the child zone are unsynchronized in the DNS
-	protocol. <xref target="RFC1034"/> Section 4.2.2 says
+	protocol. <xref target="RFC1034" format="default"/> Section 4.2.2 says
 	"The administrators of both zones should insure that the NS and
 	glue RRs which mark both sides of the cut are consistent and remain
 	so.". But for a variety of
 	reasons they could not be. Officially, a child zone's apex NS RRset
 	is authoritative and thus has a higher cache credibility than the
 	parent's delegation NS RRset, which is non-authoritative glue
-	(<xref target="RFC2181"/>, Section 5.4.1. Ranking data). Hence the
+	(<xref target="RFC2181" format="default"/>, Section 5.4.1. Ranking data). Hence the
 	NS RRset "below the zone cut" should immediately replace the parent's
 	delegating NS RRset in cache when an iterative caching DNS resolver
 	crosses a zone boundary. However, this can only happen if (1) the
@@ -163,7 +145,6 @@
 	that normal enduser applications do, and thus cannot be relied upon
         to occur with any regularity.
       </t>
-
       <t>
 	Increasingly, there is a trend towards minimizing unnecessary data
 	in DNS responses. Several popular DNS implementations default to such
@@ -171,7 +152,6 @@
         they may never include the authoritative NS RRset in the Authority
         section of their responses.
       </t>
-
       <t>
 	A common reason that zone owners want to ensure that resolvers
 	place the authoritative NS RRset preferentially in their cache is
@@ -182,7 +162,6 @@
         configuration using a shorter TTL, if resolvers have no systematic
         mechanism to observe and cache the child NS RRset.
       </t>
-
       <t>
 	A child zone's delegation still needs to be periodically
 	revalidated at the parent to make sure that the parent zone
@@ -196,8 +175,8 @@
 	RRset, and use it to trigger a revalidation action.
       </t>
       <t>
-	If both parent and child zone are DNSSEC <xref target="RFC4033" />
-	<xref target="RFC4034" /> <xref target="RFC4035" /> signed with a
+	If both parent and child zone are DNSSEC <xref target="RFC4033" format="default"/>
+        <xref target="RFC4034" format="default"/> <xref target="RFC4035" format="default"/> signed with a
 	corresponding secure delegation between them, then expiration
 	of the Delegation Signer (DS) record set will cause revalidation of
 	the current child zone's DNSKEY set. According to RFC 4035, Section
@@ -208,16 +187,13 @@
 	still necessary to locate the current nameserver addresses to which
 	subsequent DNS queries should be directed.
       </t>
-
     </section>
-
-    <section title="Upgrading NS RRset Credibility" anchor="upgrade-ns">
-
-      <t>
-      <list style="symbols">
-	<!-- Ralph: I'm not sure I like the terms forwarding the triggering
+    <section anchor="upgrade-ns" numbered="true" toc="default">
+      <name>Upgrading NS RRset Credibility</name>
+      <ul spacing="normal">
+        <!-- Ralph: I'm not sure I like the terms forwarding the triggering
 	     query, this sound very much pre-qname minimisation -->
-	<t>
+	<li>
 	   When a delegation response is received during iteration, a
 	   validation query should be sent in parallel with the resolution of
 	   the triggering query, to the delegated nameservers for the newly
@@ -226,9 +202,8 @@
 	   dispatch a query to the delegated nameservers for the DNSKEY RRset,
 	   so this validation query could be sent in parallel with that
 	   DNSKEY query.
-	</t>
-
-      	<t>
+	</li>
+        <li>
 	   A validation query consists of a query for the child's apex NS
 	   RRset, sent to the newly discovered delegation's nameservers. Normal
 	   iterative logic applies to the processing of responses to validation
@@ -240,12 +215,11 @@
 	   answer. If the validation query fails, the parent NS RRset will remain
 	   the one with the highest ranking and will be used for successive
 	   queries.
-	</t>
-
-	<!-- Ralph: fwiw, I'm ok with completely dropping the next items. Let's
+	</li>
+        <!-- Ralph: fwiw, I'm ok with completely dropping the next items. Let's
 	     keep this simple. -->
 
-	<t>
+	<li>
 	   Some resolvers may choose to delay the response to the triggering
            query until both the triggering query and the validation query have
            been answered. In practice, we expect many implementations may
@@ -254,25 +228,19 @@
            of nameservers in the field that (incorrectly) fail to answer explicit
            queries for NS records, and thus the revalidation logic may need to
            be applied lazily and opportunistically to deal with them.
-	</t>
-
-	<t>
+	</li>
+        <li>
 	   If the resolver chooses to delay the response, and there are no
 	   nameserver names in common between the child's apex NS RRset and the
 	   parent's delegation NS RRset, then the responses received from
 	   forwarding the triggering query to the parent's delegated nameservers
 	   should be discarded after validation, and this query should be
 	   forwarded again to the child's apex nameservers.
-	</t>
-
-      </list>
-      </t>
-
+	</li>
+      </ul>
     </section>
-
-
-    <section title="Delegation Revalidation" anchor="revalidation">
-
+    <section anchor="revalidation" numbered="true" toc="default">
+      <name>Delegation Revalidation</name>
       <t>
         This documents proposes two mechanisms to perform delegation
 	revalidation: an extensive and a simple mechanism. [TODO: in
@@ -280,12 +248,11 @@
         extensive mechanism description and keep only the simple one,
         assuming agreement.]
       </t>
-
       <t>The extensive mechanism:
 
-      <list style="symbols">
-
-	<t>
+      </t>
+      <ul spacing="normal">
+        <li>
 	   The lowest TTL found in a parent zone's delegating NS RRset
 	   should be stored in the cache and used to trigger delegation
 	   revalidation as follows: Whenever a cached RRset is being considered
@@ -294,9 +261,8 @@
 	   delegation encountered while walking upward toward the root,
 	   revalidation should be triggered, putting the processing of dependent
 	   queries on hold until validation is complete.
-	</t>
-
-	<t>
+	</li>
+        <li>
 	   To revalidate a delegation, the iterative caching DNS resolver
 	   will forward the query that triggered revalidation to the nameservers
 	   at the closest enclosing zone cut above the revalidation point. While
@@ -304,9 +270,8 @@
 	   perhaps placing a chain of dependent queries on hold, unwinding in
 	   downward order as revalidations closer to the root must be complete
 	   before revalidations further from the root can begin.
-	</t>
-
-	<t>
+	</li>
+        <li>
 	   If a delegation can be revalidated at the same node, then the
 	   old apex NS RRset should be deleted from cache and then the new
 	   delegating NS RRset should be stored in cache. The minimum TTL from
@@ -316,9 +281,8 @@
 	   RRset from entering the cache. It is expected that the child's apex
 	   NS RRset will rapidly replace the parent's delegating NS RRset as
 	   soon as iteration restarts after the revalidation event.
-	</t>
-
-	<t>
+	</li>
+        <li>
 	   If the new delegating NS RRset cannot be found (RCODE=NXDOMAIN)
 	   or if there is a new zone cut at some different level of the
 	   hierarchy (insertion or deletion of a delegation point above the
@@ -328,44 +292,45 @@
 	   or below the revalidation point. This facilitates redelegation or
 	   revocation of a zone by a parent zone administrator, and also
 	   conserves cache storage by deleting unreachable data.
-	</t>
-      </list>
+	</li>
+      </ul>
+      <t>
 
       The simple mechanism:
-      <list style="symbols">
-	<t>
+      </t>
+      <ul spacing="normal">
+        <li>
 	   Cap the time to cache the child NS RRset to the lower of child
            and parent NS RRset TTL. The normal iterative resolution algorithm
            will then cause delegation revalidation to naturally occur at the
            expiration of the capped child NS TTL, along with dispatching of
            the validation query to upgrade NS RRset credibility.
-	</t>
-      </list></t>
-
+	</li>
+      </ul>
     </section>
-
-    <section anchor="Acknowledgements" title="Acknowledgements">
+    <section anchor="Acknowledgements" numbered="true" toc="default">
+      <name>Acknowledgements</name>
       <t>
         Wouter Wijngaards proposed explicitly obtaining authoritative child
-        NS data in <xref target="I-D.wijngaards-dnsext-resolver-side-mitigation"/>. This behavior has been implemented in the Unbound DNS resolver via the
+        NS data in <xref target="I-D.wijngaards-dnsext-resolver-side-mitigation" format="default"/>. This behavior has been implemented in the Unbound DNS resolver via the
         "harden-referral-path" option. The combination of child NS fetch and
         revalidating the child delegation was originally proposed
-	in <xref target="I-D.vixie-dnsext-resimprove"/>, by Vixie, Joffe,
+	in <xref target="I-D.vixie-dnsext-resimprove" format="default"/>, by Vixie, Joffe,
 	and Neves.
       </t>
     </section>
-
-    <section anchor="IANA" title="IANA Considerations">
+    <section anchor="IANA" numbered="true" toc="default">
+      <name>IANA Considerations</name>
       <t>This document includes no request to IANA.</t>
     </section>
-
-    <section anchor="Security" title="Security Considerations">
+    <section anchor="Security" numbered="true" toc="default">
+      <name>Security Considerations</name>
       <t>
-	<xref target="upgrade-ns">Upgrading NS RRset Credibility</xref>
+	<xref target="upgrade-ns" format="default">Upgrading NS RRset Credibility</xref>
 	allows resolvers to cache and utilize the authoritative child
 	apex NS RRset in preference to the non-authoriative parent NS
 	RRset. However, it is important to implement the steps described in
-        <xref target="revalidation">Delegation Revalidation</xref> at
+        <xref target="revalidation" format="default">Delegation Revalidation</xref> at
 	the expiration of the parent's delegating TTL. Otherwise, the
 	operator of a malicious child zone, originally delegated to, but
 	subsequently delegated away from, can cause resolvers that refresh
@@ -379,19 +344,22 @@
   <!--	*****BACK MATTER ***** -->
 
   <back>
-    <references title="Normative References">
-      &RFC1034;
-      &RFC1035;
-      &RFC2181;
-    </references>
-
-    <references title="Informative References">
-      &RFC4033;
-      &RFC4034;
-      &RFC4035;
-      &I-D.vixie-dnsext-resimprove;
-      &I-D.wijngaards-dnsext-resolver-mitigation;
+    <references>
+      <name>References</name>
+      <references>
+        <name>Normative References</name>
+        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.1034.xml"/>
+        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.1035.xml"/>
+        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2181.xml"/>
+      </references>
+      <references>
+        <name>Informative References</name>
+        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"/>
+        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4034.xml"/>
+        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4035.xml"/>
+        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-vixie-dnsext-resimprove-00.xml"/>
+        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-wijngaards-dnsext-resolver-side-mitigation-01.xml"/>
+      </references>
     </references>
   </back>
-
 </rfc>
