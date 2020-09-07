@@ -265,8 +265,13 @@
 	</li>
         <li>
 	   To revalidate a delegation, the iterative caching DNS resolver
-	   will forward the query that triggered revalidation to the nameservers
-	   at the closest enclosing zone cut above the revalidation point. While
+	   will redo resolution of the triggering query at the closest
+           enclosing zone cut above the revalidation point. If
+           <xref target="RFC7816" format="default">Query-name Minimization
+           </xref> is being employed, this may not be the full name of the
+           triggering query, but the query name with some number of left
+           most labels excised as dictated by the qname minimization
+           algorithm.  While
 	   searching for these nameservers, additional revalidations may occur,
 	   perhaps placing a chain of dependent queries on hold, unwinding in
 	   downward order as revalidations closer to the root must be complete
@@ -397,6 +402,7 @@
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.1034.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.1035.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2181.xml"/>
+        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7816.xml"/>
       </references>
       <references>
         <name>Informative References</name>
