@@ -370,6 +370,26 @@
       </t>
     </section>
 
+    <section anchor="redelegations" numbered="true" toc="default">
+      <name>Re-delegations and Delegation Removals</name>
+      <t>
+        TODO: mention in more detail what to do when resolvers observe
+        redelegations or removal of delegations at the parent. A quick
+        initial summary follows.
+      </t>
+      <t>
+        If a delegation is removed (i.e. the parent returns NXDOMAIN),
+        then cache contents should be treated as described in
+        <xref target="RFC8020" format="default"/> -- ideally the resolver's
+        cache should be entirely pruned at the delegation point, or the
+        cached contents below the delegation may be allowed to be used until
+        they expire. Similar treatment of the cache should be followed if
+        the child zone has been entirely re-delegated to a new set of
+        nameservers. If only a subset of nameservers have been re-delegated,
+        then no new cache cleanup action is needed.
+      </t>
+    </section>
+
     <section anchor="IANA" numbered="true" toc="default">
       <name>IANA Considerations</name>
       <t>This document includes no request to IANA.</t>
@@ -406,6 +426,7 @@
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.1035.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2181.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7816.xml"/>
+        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8020.xml"/>
       </references>
       <references>
         <name>Informative References</name>
