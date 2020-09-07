@@ -357,17 +357,6 @@
 
     </section>
 
-    <section anchor="Acknowledgements" numbered="true" toc="default">
-      <name>Acknowledgements</name>
-      <t>
-        Wouter Wijngaards proposed explicitly obtaining authoritative child
-        NS data in <xref target="I-D.wijngaards-dnsext-resolver-side-mitigation" format="default"/>. This behavior has been implemented in the Unbound DNS resolver via the
-        "harden-referral-path" option. The combination of child NS fetch and
-        revalidating the child delegation was originally proposed
-	in <xref target="I-D.vixie-dnsext-resimprove" format="default"/>, by Vixie, Joffe,
-	and Neves.
-      </t>
-    </section>
     <section anchor="IANA" numbered="true" toc="default">
       <name>IANA Considerations</name>
       <t>This document includes no request to IANA.</t>
@@ -395,6 +384,7 @@
   <!--	*****BACK MATTER ***** -->
 
   <back>
+
     <references>
       <name>References</name>
       <references>
@@ -421,5 +411,18 @@
         </reference>
       </references>
     </references>
+
+    <section anchor="Acknowledgements" numbered="false" toc="default">
+      <name>Acknowledgements</name>
+      <t>
+        Wouter Wijngaards proposed explicitly obtaining authoritative child
+        NS data in <xref target="I-D.wijngaards-dnsext-resolver-side-mitigation" format="default"/>. This behavior has been implemented in the Unbound DNS resolver via the
+        "harden-referral-path" option. The combination of child NS fetch and
+        revalidating the child delegation was originally proposed
+	in <xref target="I-D.vixie-dnsext-resimprove" format="default"/>, by Vixie, Joffe,
+	and Neves.
+      </t>
+    </section>
+
   </back>
 </rfc>
