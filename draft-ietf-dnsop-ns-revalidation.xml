@@ -357,6 +357,19 @@
 
     </section>
 
+    <section anchor="optimize" numbered="true" toc="default">
+      <name>Optimizations</name>
+      <t>
+        TODO: mention possible optimizations: record whether certain
+        nameservers return the child NS set in their authoritative section
+        responses and subsequently forego the extra child NS query for a
+        period of time. Suggest that authoritative servers that do
+        minimal responses return their NS sets in response to DNSKEY
+        queries, and resolvers that see such behavior may also subsequently
+        forego the extra child NS query (from Olafur G.).
+      </t>
+    </section>
+
     <section anchor="IANA" numbered="true" toc="default">
       <name>IANA Considerations</name>
       <t>This document includes no request to IANA.</t>
