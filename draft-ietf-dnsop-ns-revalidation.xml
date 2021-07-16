@@ -163,7 +163,7 @@
       <t>
 	Increasingly, there is a trend towards minimizing unnecessary data
 	in DNS responses. Several popular DNS implementations default to such
-	a configuration (see "minimal-responses" in BIND and Unbound). So,
+	a configuration (see "minimal-responses" in BIND and NSD). So,
         they may never include the authoritative NS RRset in the Authority
         section of their responses.
       </t>
