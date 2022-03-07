@@ -31,7 +31,7 @@
 
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude"
         category="std" consensus="true"
-        docName="draft-ietf-dnsop-ns-revalidation-01"
+        docName="draft-ietf-dnsop-ns-revalidation-02"
         ipr="trust200902" obsoletes="" updates=""
         submissionType="IETF" xml:lang="en"
         tocInclude="true" tocDepth="4"
@@ -45,7 +45,7 @@
 	Delegation Revalidation by DNS Resolvers
     </title>
     <seriesInfo name="Internet-Draft"
-        value="draft-ietf-dnsop-ns-revalidation-01"/>
+        value="draft-ietf-dnsop-ns-revalidation-02"/>
     <author fullname="Shumon Huque" initials="S." surname="Huque">
       <organization>Salesforce</organization>
       <address>
@@ -67,7 +67,7 @@
         <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
-    <date day="12" month="7" year="2021"/>
+    <date day="07" month="3" year="2022"/>
     <!-- Meta-data Declarations -->
 
     <area>General</area>
@@ -242,152 +242,66 @@
 	</li>
       </ul>
     </section>
+
     <section anchor="revalidation" numbered="true" toc="default">
       <name>Delegation Revalidation</name>
+
       <t>
-        This documents proposes two mechanisms to perform delegation
-	revalidation: an extensive and a simple mechanism. [TODO: should
-        we keep just the simple mechanism?]
-      </t>
-      <t>The extensive mechanism:
-
-      </t>
-      <ul spacing="normal">
-        <li>
-	   The lowest TTL found in a parent zone's delegating NS RRset
-	   should be stored in the cache and used to trigger delegation
-	   revalidation as follows: Whenever a cached RRset is being considered
-	   for use in a response, the cache should be walked upward toward the
-	   root, looking for expired delegations. At the first expired
-	   delegation encountered while walking upward toward the root,
-	   revalidation should be triggered, putting the processing of dependent
-	   queries on hold until validation is complete.
-	</li>
-        <li>
-	   To revalidate a delegation, the iterative caching DNS resolver
-	   will redo resolution of the triggering query at the closest
-           enclosing zone cut above the revalidation point. If
-           <xref target="RFC7816" format="default">Query-name Minimization
-           </xref> is being employed, this may not be the full name of the
-           triggering query, but the query name with some number of left
-           most labels excised as dictated by the qname minimization
-           algorithm.  While
-	   searching for these nameservers, additional revalidations may occur,
-	   perhaps placing a chain of dependent queries on hold, unwinding in
-	   downward order as revalidations closer to the root must be complete
-	   before revalidations further from the root can begin.
-	</li>
-        <li>
-	   If a delegation can be revalidated at the same node, then the
-	   old apex NS RRset should be deleted from cache and then the new
-	   delegating NS RRset should be stored in cache. The minimum TTL from
-	   the new delegating NS RRset should also be stored in cache to
-	   facilitate future revalidations. This order of operations ensures
-	   that the RRset credibility rules do not prevent the new delegating NS
-	   RRset from entering the cache. It is expected that the child's apex
-	   NS RRset will rapidly replace the parent's delegating NS RRset as
-	   soon as iteration restarts after the revalidation event.
-	</li>
-        <li>
-	   If the new delegating NS RRset cannot be found (RCODE=NXDOMAIN)
-	   or if there is a new zone cut at some different level of the
-	   hierarchy (insertion or deletion of a delegation point above the
-	   revalidation point) or if the new RRset shares no nameserver names in
-	   common with the old one (indicating some kind of redelegation, which
-	   is rare) then the cache should be purged of all names and RRsets at
-	   or below the revalidation point. This facilitates redelegation or
-	   revocation of a zone by a parent zone administrator, and also
-	   conserves cache storage by deleting unreachable data.
-	</li>
-      </ul>
-      <t>
-
-      The simple mechanism:
-      </t>
-      <ul spacing="normal">
-        <li>
-	   Cap the time to cache the child NS RRset to the lower of child
-           and parent NS RRset TTL. The normal iterative resolution algorithm
-           will then cause delegation revalidation to naturally occur at the
-           expiration of the capped child NS TTL, along with dispatching of
-           the validation query to upgrade NS RRset credibility.
-	</li>
-      </ul>
-
-      <section anchor="UsingDS" toc="default">
-        <name>Using the DS Record TTL</name>
-        <t>
-	  If both parent and child zone are DNSSEC
-          <xref target="RFC4033" format="default"/>
-          <xref target="RFC4034" format="default"/>
-          <xref target="RFC4035" format="default"/> signed with a
-	  corresponding secure delegation between them, then expiration
-	  of the Delegation Signer (DS) record set will cause revalidation of
-	  the current child zone's DNSKEY set. According to RFC 4035, Section
-	  2.4, "The TTL of a DS RRSet SHOULD match the TTL of the delegating
-	  NS RRset", so this revalidation should be triggered on the same
-	  time scale, and thus responses from the stale child nameservers
-	  would no longer be trusted. However, delegation revalidation is
-	  still necessary to locate the current nameserver addresses to which
-	  subsequent DNS queries should be directed.
-        </t>
-        <t>
-          In practice, the DS
-          TTL often differs from the delegating NS TTL. For example,
-          currently the root zone and the COM and NET TLDs all set an
-          NS RRset TTL of 2 days, while the DS RRset TTL is just 1 day.
-          <xref target="rssac-003" format="default">RSSAC-003</xref>
-          makes the following observation:
-          "In the root zone, delegating NS records have a 2 day TTL. However,
-          the DS records have a 1 day TTL, against the advice of RFC 4035.
-          This is not particularly surprising since a mistake with a DS record
-          can deny resolution for all names under a TLD. Given the way that DS
-          records are currently used in the root zone (e.g., usually matching
-          just one TLD KSK) it is better for them to have a lower TTL in the
-          event of an emergency change."
-        </t>
-        <t>
-          If a secure delegation is present, resolvers may use the
-          DS RRset's TTL as the revalidation interval in preference to
-          to the delegating NS RRSet TTL. (Question: should this be the
-          recommendation instead?; after all the DS is signed so its TTL cannot
-          be spoofed.?)
-        </t>
-      </section>
-
-    </section>
-
-    <section anchor="optimize" numbered="true" toc="default">
-      <name>Optimizations</name>
-      <t>
-        TODO: mention possible optimizations: record whether certain
-        nameservers return the child NS set in their authoritative section
-        responses and subsequently forego the extra child NS query for a
-        period of time. Suggest that authoritative servers that do
-        minimal responses return their NS sets in response to DNSKEY
-        queries, and resolvers that see such behavior may also subsequently
-        forego the extra child NS query (from Olafur G.).
-      </t>
-    </section>
-
-    <section anchor="redelegations" numbered="true" toc="default">
-      <name>Re-delegations and Delegation Removals</name>
-      <t>
-        TODO: mention in more detail what to do when resolvers observe
-        redelegations or removal of delegations at the parent. A quick
-        initial summary follows.
+      The essence of this mechanism is re-validation of all delegation
+      metadata that directly or indirectly supports an owner name in cache.
+      This requires a cache to remember the delegated name server names for
+      each zone cut as received from the parent (delegating) zone's name
+      servers, and also the TTL of that NS RRset, and the TTL of the
+      associated DS RRset (if seen).
       </t>
       <t>
-        If a delegation is removed (i.e. the parent returns NXDOMAIN),
-        then cache contents should be treated as described in
-        <xref target="RFC8020" format="default"/> -- ideally the resolver's
-        cache should be entirely pruned at the delegation point, or the
-        cached contents below the delegation may be allowed to be used until
-        they expire. Similar treatment of the cache should be followed if
-        the child zone has been entirely re-delegated to a new set of
-        nameservers. If only a subset of nameservers have been re-delegated,
-        then no new cache cleanup action is needed.
+      A delegation under re-validation is called a "re-validation point" and
+      is "still valid" if its parent zone's servers still respond to an
+      in-zone question with a referral to the re-validation point, and if that
+      referral overlaps with the previously cached referral by at least one
+      name server name, and the DS RRset (if seen) overlaps the previously
+      cached DS RRset (if also seen) by at least one delegated signer.
       </t>
+      <t>
+      If the response is not a referral or refers to a different zone than
+      before, then the shape of the delegation hierarchy has changed. If the
+      response is a referral to the re-validation point but to a wholly novel
+      NS RRset or a wholly novel DS RRset, then the authority for that zone
+      has changed. For clarity, this includes transitions between empty and
+      non-empty DS RRsets.
+      </t>
+      <t>
+      If the shape of the delegation hierarchy or the authority for a zone
+      has been found to change, then no currently cached data whose owner
+      names are at or below that re-validation point can be used. Such non-use
+      can be by directed garbage collection or lazy generational garbage
+      collection or some other method befitting the architecture of the cache.
+      What matters is that the cache behave as though this data was removed.
+      </t>
+      <t>
+      Since re-validation can discover changes in the shape of the
+      delegation hierarchy it is more efficient to re-validate from the top
+      (root) downward (to the owner name) since an upper level re-validation
+      may obviate lower level re-validations. What matters is that the
+      supporting chain of delegations from the root to the owner name be
+      demonstrably valid; further specifics are implementation details.
+      </t>
+      <t>
+      Re-validation is triggered when delegation meta-data has been cached
+      for a period at most exceeding the delegating NS or DS (if seen) RRset
+      TTL. If the corresponding child zone's apex NS RRset TTL is smaller
+      than the delegating NS RRset TTL, revalidation should happen at that
+      interval instead. However, resolvers should impose a sensitive minimum
+      TTL floor they are willing to endure to avoid potential computational
+      DoS attacks inflicted by zones with very short TTLs.
+      </t>
+      <t>
+      In normal operations this meta-data can be quickly re-validated with
+      no further work. However, when re-delegation or take-down occurs, a
+      re-validating cache will discover this within one delegation TTL
+      period, allowing the rapid expulsion of old data from the cache.
+      </t>
+
     </section>
 
     <section anchor="IANA" numbered="true" toc="default">
@@ -425,24 +339,12 @@
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.1034.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.1035.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2181.xml"/>
-        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7816.xml"/>
-        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8020.xml"/>
       </references>
       <references>
         <name>Informative References</name>
-        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"/>
-        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4034.xml"/>
-        <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4035.xml"/>
         <xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5731.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-vixie-dnsext-resimprove-00.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-wijngaards-dnsext-resolver-side-mitigation-01.xml"/>
-        <reference anchor="rssac-003" target="https://www.icann.org/en/system/files/files/rssac-003-root-zone-ttls-21aug15-en.pdf">
-          <front>
-            <title>RSSAC003 Report on Root Zone TTLs</title>
-            <author fullname="RSSAC_Caucus"/>
-            <date month="August" year="2015"/>
-          </front>
-        </reference>
       </references>
     </references>
 
