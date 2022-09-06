@@ -31,7 +31,7 @@
 
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude"
         category="std" consensus="true"
-        docName="draft-ietf-dnsop-ns-revalidation-02"
+        docName="draft-ietf-dnsop-ns-revalidation-03"
         ipr="trust200902" obsoletes="" updates=""
         submissionType="IETF" xml:lang="en"
         tocInclude="true" tocDepth="4"
@@ -45,7 +45,7 @@
 	Delegation Revalidation by DNS Resolvers
     </title>
     <seriesInfo name="Internet-Draft"
-        value="draft-ietf-dnsop-ns-revalidation-02"/>
+        value="draft-ietf-dnsop-ns-revalidation-03"/>
     <author fullname="Shumon Huque" initials="S." surname="Huque">
       <organization>Salesforce</organization>
       <address>
@@ -67,7 +67,7 @@
         <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
-    <date day="07" month="3" year="2022"/>
+    <date day="06" month="9" year="2022"/>
     <!-- Meta-data Declarations -->
 
     <area>General</area>
@@ -172,10 +172,7 @@
 	place the authoritative NS RRset preferentially in their cache is
 	that the TTLs may differ between the parent and child side of the
 	zone cut. Some DNS Top Level Domains (TLDs) only support long fixed
-	TTLs in their delegation NS sets. In fact, the
-        <xref target="RFC5731" format="default">Extensible Provisioning
-        Protocol (EPP)</xref>, that is often used by TLDs to configure
-        delegation parameters has no provision to set the TTL. This inhibits
+	TTLs in their delegation NS sets. This inhibits
         a child zone owner's ability to make more rapid changes to their
         nameserver configuration using a shorter TTL, if resolvers have no
         systematic mechanism to observe and cache the child NS RRset.
@@ -198,7 +195,7 @@
       <name>Upgrading NS RRset Credibility</name>
       <ul spacing="normal">
 	<li>
-	   When a delegation response is received during iteration, a
+	   When a referral response is received during iteration, a
 	   validation query should be sent in parallel with the resolution of
 	   the triggering query, to the delegated nameservers for the newly
 	   discovered zone cut. Note that validating resolvers today,
@@ -211,7 +208,7 @@
 	   RRset, sent to the newly discovered delegation's nameservers. Normal
 	   iterative logic applies to the processing of responses to validation
 	   queries, including storing the results in cache, trying the next
-	   server on SERVFAIL or timeout, and so on. Positive answers to this
+	   server on SERVFAIL or timeout, and so on. Positive responses to this
 	   validation query will be cached with an authoritative data ranking.
 	   Successive queries directed to the same zone will be directed to the
 	   nameservers listed in the child's apex, due to the ranking of this
@@ -223,14 +220,19 @@
 	     keep this simple. -->
 
 	<li>
-	   Some resolvers may choose to delay the response to the triggering
+	   Resolvers may choose to delay the response to the triggering
            query until both the triggering query and the validation query have
            been answered. In practice, we expect many implementations may
            answer the triggering query in advance of the validation query for
-           performance reasons. An additional reason is that there are number
-           of nameservers in the field that (incorrectly) fail to answer explicit
-           queries for NS records, and thus the revalidation logic may need to
-           be applied lazily and opportunistically to deal with them.
+           performance reasons. An additional reason is that there are 
+           unfortunately a number of nameservers in the field that
+           (incorrectly) fail to properly answer explicit queries for zone
+           apex NS records, and thus the revalidation logic may need to
+           be applied lazily and opportunistically to deal with them. In cases
+           where the delegated nameservers respond incorrectly to an NS query,
+           the resolver should abandon this algorithm for the zone in question
+           and fall back to using only the information from the parent's
+           referral response.
 	</li>
         <li>
 	   If the resolver chooses to delay the response, and there are no
@@ -342,7 +344,6 @@
       </references>
       <references>
         <name>Informative References</name>
-        <xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5731.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-vixie-dnsext-resimprove-00.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-wijngaards-dnsext-resolver-side-mitigation-01.xml"/>
       </references>
