@@ -54,7 +54,7 @@
       </address>
     </author>
     <author fullname="Paul Vixie" initials="P." surname="Vixie">
-      <organization>Farsight Security</organization>
+      <organization>SIE Europe, U.G.</organization>
       <address>
         <email>paul@redbarn.org</email>
         <!-- uri and facsimile elements may also be added -->
@@ -67,7 +67,7 @@
         <!-- uri and facsimile elements may also be added -->
       </address>
     </author>
-    <date day="06" month="9" year="2022"/>
+    <date day="13" month="3" year="2023"/>
     <!-- Meta-data Declarations -->
 
     <area>General</area>
@@ -188,6 +188,9 @@
         recommendation in this document, "Delegation Revalidation" - Resolvers
         should record the TTL of the parent's delegating NS RRset, and use it
         to trigger a revalidation action.
+        Attacks exploiting lack of this revalidation have been described in
+        <xref target="GHOST1" format="default"/>,
+        <xref target="GHOST2" format="default"/>.
       </t>
     </section>
 
@@ -323,8 +326,7 @@
 	operator of a malicious child zone, originally delegated to, but
 	subsequently delegated away from, can cause resolvers that refresh
 	TTLs on subsequent NS set queries, or that pre-fetch NS queries, to
-	never learn of the redelegated zone. This problem has been
-	seen in the wild [include reference to Ghost Domains paper here].
+	never learn of the redelegated zone.
       </t>
     </section>
 
@@ -346,6 +348,35 @@
         <name>Informative References</name>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-vixie-dnsext-resimprove-00.xml"/>
         <xi:include href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.draft-wijngaards-dnsext-resolver-side-mitigation-01.xml"/>
+
+        <reference anchor="GHOST1"
+           target="https://www.ndss-symposium.org/ndss2012/">
+          <front>
+            <title>Ghost Domain Names: Revoked Yet Still Resolvable</title>
+            <author fullname="J Jiang" initials="J" surname="Jiang" />
+            <author fullname="J Liang" initials="J" surname="Liang" />
+            <author fullname="K Li" initials="K" surname="Li" />
+            <author fullname="J Li" initials="J" surname="Li" />
+            <author fullname="H Duan" initials="H" surname="Duan" />
+            <author fullname="J Wu" initials="J" surname="Wu" />
+            <date />
+          </front>
+        </reference>
+        <reference anchor="GHOST2"
+           target="https://www.ndss-symposium.org/ndss-paper/ghost-domain-reloaded-vulnerable-links-in-domain-name-delegation-and-revocation/">
+          <front>
+            <title>Ghost Domain Reloaded: Vulnerable Links in Domain Name Delegation and Revocation</title>
+            <author fullname="Xiang Li" initials="X" surname="Li" />
+            <author fullname="Baojun Liu" initials="B" surname="Liu" />
+            <author fullname="Xuesong Bai" initials="X" surname="Bai" />
+            <author fullname="Mingming Zhang" initials="M" surname="Zhang" />
+            <author fullname="Qifan Zhang" initials="Q" surname="Zhang" />
+            <author fullname="Zhou Li" initials="Z" surname="Li" />
+            <author fullname="Haixin Duan" initials="H" surname="Duan" />
+            <author fullname="Qi Li" initials="Q" surname="Li" />
+            <date />
+          </front>
+        </reference>
       </references>
     </references>
 
