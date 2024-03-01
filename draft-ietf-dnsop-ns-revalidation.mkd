@@ -36,10 +36,14 @@ author:
     organization: SIE Europe, U.G.
     email: paul@redbarn.org
   -
-    ins: R. Dolmans
-    name: Ralph Dolmans
+    ins: W. Toorop
+    name: Willem Toorop
     organization: NLnet Labs
-    email: ralph@nlnetlabs.nl
+    street: Science Park 400
+    city: Amsterdam
+    code: 1098 XH
+    country: Netherlands
+    email: willem@nlnetlabs.nl
 
 normative:
     RFC1034:
