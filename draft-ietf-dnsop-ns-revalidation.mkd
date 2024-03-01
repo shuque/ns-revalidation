@@ -2,7 +2,7 @@
 title: Delegation Revalidation by DNS Resolvers
 abbrev: DNS Delegation Revalidation
 docname: draft-ietf-dnsop-ns-revalidation-05
-date: 2024-03-01
+date: 2024-03-04
 
 ipr: trust200902
 submissiontype: IETF
