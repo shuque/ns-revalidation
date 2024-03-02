@@ -57,50 +57,50 @@ informative:
         target: https://www.ndss-symposium.org/ndss2012/
         title: "Ghost Domain Names: Revoked Yet Still Resolvable"
         author:
-	  -
+          -
             name: J Jiang
             ins: J. Jiang
-	  -
+          -
             name: J Liang
             ins: J. Liang
-	  -
+          -
             name: K Li
             ins: K. Li
-	  -
+          -
             name: J Li
             ins: J. Li
-	  -
+          -
             name: H Duan
             ins: H. Duan
-	  -
+          -
             name: J Wu
             ins: J. Wu
     GHOST2:
         target: https://www.ndss-symposium.org/ndss-paper/ghost-domain-reloaded-vulnerable-links-in-domain-name-delegation-and-revocation/
         title: "Ghost Domain Reloaded: Vulnerable Links in Domain Name Delegation and Revocation"
         author:
-	  -
+          -
             name: Xiang Li
             ins: X. Li
-	  -
+          -
             name: Baojun Liu
             ins: B. Liu
-	  -
+          -
             name: Xuesong Bai
             ins: X. Bai
-	  -
+          -
             name: Mingming Zhang
             ins: M. Zhang
-	  -
+          -
             name: Qifan Zhang
             ins: Q. Zhang
-	  -
+          -
             name: Zhou Li
             ins: Z. Li
-	  -
+          -
             name: Haixin Duan
             ins: H. Duan
-	  -
+          -
             name: Qi Li
             ins: Q. Li
 
