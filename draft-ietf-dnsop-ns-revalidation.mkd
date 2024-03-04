@@ -21,6 +21,10 @@ kw:
   - Child
   - Resource Record Set
 cat: std
+venue:
+  group: DNSOP
+  mail: dnsop@ietf.org
+  github: shuque/ns-revalidation
 
 pi: [toc, sortrefs, symrefs]
 
@@ -115,8 +119,6 @@ Resolvers should also periodically revalidate the child delegation by re-quering
 
 Introduction                    {#into}
 ============
-
-RFC EDITOR: PLEASE REMOVE THIS PARAGRAPH BEFORE PUBLISHING: The source for this draft is maintained in GitHub at: <https://github.com/shuque/ns-revalidation>
 
 This document recommends improved DNS resolver behavior with respect to the processing of NS record sets during iterative resolution.
 The first recommendation is that resolvers, when following a referral response from an authoritative server to a child zone, should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
