@@ -53,6 +53,7 @@ normative:
     RFC1034:
     RFC1035:
     RFC2181:
+    RFC8109:
 
 informative:
     I-D.vixie-dnsext-resimprove:
@@ -175,7 +176,7 @@ Upgrading NS RRset Credibility  {#upgrade-ns}
     Outstanding validation queries for "glue" that do not match names in the authoritative NS RRset be discarded, or they may be left running to completion.
     Their result will no longer be used in queries for the zone.
     Outstanding validation queries for "glue" that do match names in the authoritative NS RRset must be left running to completion.
-    They do not need to be requeried after reception of the authoritative NS RRset (see {{#upgrade-addresses}}
+    They do not need to be requeried after reception of the authoritative NS RRset (see [](#upgrade-addresses))
 
     [//]: # (Ralph: fwiw, I'm ok with completely dropping the next items. Let's keep this simple.)
 
