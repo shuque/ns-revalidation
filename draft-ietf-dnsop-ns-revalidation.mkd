@@ -249,5 +249,6 @@ Acknowledgements                {#Acknowledgements}
 
 Wouter Wijngaards proposed explicitly obtaining authoritative child NS data in {{I-D.wijngaards-dnsext-resolver-side-mitigation}}.
 This behavior has been implemented in the Unbound DNS resolver via the "harden-referral-path" option.
-The combination of child NS fetch and revalidating the child delegation was originally proposed in {{I-D.vixie-dnsext-resimprove}}, by Vixie, Joffe, and Neves.
+The combination of child NS fetch and revalidating the child delegation was originally proposed in {{I-D.vixie-dnsext-resimprove}}, by Paul Vixie, Rodney Joffe, and Frederico Neves.
 
+The authors would like to thank Ralph Dolmans who was an early collaborator on this work, as well as the many members of the IETF DNS Operations Working Group for helpful comments and discussion.
