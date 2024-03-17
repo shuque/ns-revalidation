@@ -114,8 +114,8 @@ informative:
 
 This document recommends improved DNS {{RFC1034}} {{RFC1035}} resolver behavior with respect to the processing of Name Server (NS) resource record sets (RRset) during iterative resolution.
 When following a referral response from an authoritative server to a child zone, DNS resolvers should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
-The (A and AAAA) address RRsets in the additional section from referral responses and authoritative NS answers for the names of the NS RRset, should similarly be requeried and used to replace the entries with the lower trustworthiness ranking in cache.
-Resolvers should also periodically revalidate the child delegation by re-quering the parent zone at the expiration of the TTL of the parent side NS RRset.
+The (A and AAAA) address RRsets in the additional section from referral responses and authoritative NS answers for the names of the NS RRset, should similarly be re-queried and used to replace the entries with the lower trustworthiness ranking in cache.
+Resolvers should also periodically revalidate the child delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
 
 --- middle
 
@@ -124,9 +124,9 @@ Introduction                    {#into}
 
 This document recommends improved DNS resolver behavior with respect to the processing of NS record sets during iterative resolution.
 The first recommendation is that resolvers, when following a referral response from an authoritative server to a child zone, should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
-The address records in the additional section from the referral respons (as glue) or authoritative NS respons that match the names of the NS RRset should similarly be required if they are cached non-authoritatively.
+The address records in the additional section from the referral response (as glue) or authoritative NS response that match the names of the NS RRset should similarly be required if they are cached non-authoritatively.
 The authoritative answers from those queries should replace the cached non-authoritative A and AAAA RRsets.
-The second recommendation is to revalidate the delegation by re-quering the parent zone at the expiration of the TTL of the parent side NS RRset.
+The second recommendation is to revalidate the delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
 
 Motivation                      {#motivation}
 ==========
@@ -151,6 +151,11 @@ A common reason that zone owners want to ensure that resolvers place the authori
 Some DNS Top Level Domains (TLDs) only support long fixed TTLs in their delegation NS sets.
 This inhibits a child zone owner's ability to make more rapid changes to their nameserver configuration using a shorter TTL, if resolvers have no systematic mechanism to observe and cache the child NS RRset.
 
+:[//] # (Willem: The other way around is also possible. A zone owner may prefer to have longer TTLs than the referral; for example root-servers.net.)
+
+
+:[//] # (Willem: Another motivation)
+
 A child zone's delegation still needs to be periodically revalidated at the parent to make sure that the parent zone has not legitimately re-delegated the zone to a different set of nameservers, or even removed the delegation.
 Otherwise, resolvers that refresh the TTL of a child NS RRset on subsequent queries or due to pre-fetching, may cling to those nameservers long after they have been re-delegated elsewhere.
 This leads to the second recommendation in this document, "Delegation Revalidation" - Resolvers should record the TTL of the parent's delegating NS RRset, and use it to trigger a revalidation action.
@@ -170,13 +175,13 @@ Upgrading NS RRset Credibility  {#upgrade-ns}
 
 -   Additional validation queries for the "glue" resource records of referral responses (if not already authoritatively present in cache) may be sent with the validation query for the NS RRset as well.
     Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
-    Successive queries directed to the same zone will ne directed to the authoritative values for the names of the NS RRset in the referral response.
+    Successive queries directed to the same zone will be directed to the authoritative values for the names of the NS RRset in the referral response.
 
 -   The names from the NS RRset from a validating NS query may differ from the names in NS RRset in the referral response.
     Outstanding validation queries for "glue" that do not match names in the authoritative NS RRset be discarded, or they may be left running to completion.
     Their result will no longer be used in queries for the zone.
     Outstanding validation queries for "glue" that do match names in the authoritative NS RRset must be left running to completion.
-    They do not need to be requeried after reception of the authoritative NS RRset (see [](#upgrade-addresses))
+    They do not need to be re-queried after reception of the authoritative NS RRset (see [](#upgrade-addresses)).
 
     [//]: # (Ralph: fwiw, I'm ok with completely dropping the next items. Let's keep this simple.)
 
@@ -194,7 +199,7 @@ A NS RRset validation response is such an example of such responses.
 A priming response is another example of an authoritative zone's NS RRset response {{RFC8109}}.
 
 Additional addresses in authoritative NS RRset responses SHOULD be validated if they are not already authoritatively in cache.
-Only when such additional addresses are DNSSEC verifyable, (because the complete RRset is included, including a verifyable signature for the RRset), such additional addresses can be cached authoritively immediatly without additional validation queries.
+Only when such additional addresses are DNSSEC verifiable, (because the complete RRset is included, including a verifiable signature for the RRset), such additional addresses can be cached authoritatively immediately without additional validation queries.
 DNSSEC validation is enough validation in those cases.
 Otherwise, the addresses cannot be assumed to be complete or even authoritatively present in the same zone, and additional validation queries SHOULD be made for these addresses.
 
@@ -238,7 +243,7 @@ This document includes no request to IANA.
 Security Considerations         {#Security}
 =======================
 
-[Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoriative parent NS RRset.
+[Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
 However, it is important to implement the steps described in [Delegation Revalidation](#revalidation) at the expiration of the parent's delegating TTL.
 Otherwise, the operator of a malicious child zone, originally delegated to, but subsequently delegated away from, can cause resolvers that refresh TTLs on subsequent NS set queries, or that pre-fetch NS queries, to never learn of the redelegated zone.
 
