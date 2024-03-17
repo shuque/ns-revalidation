@@ -2,7 +2,7 @@
 title: Delegation Revalidation by DNS Resolvers
 abbrev: DNS Delegation Revalidation
 docname: draft-ietf-dnsop-ns-revalidation-05
-date: 2024-03-04
+date: 2024-03-18
 
 ipr: trust200902
 submissiontype: IETF
@@ -149,12 +149,10 @@ So, they may never include the authoritative NS RRset in the Authority section o
 
 A common reason that zone owners want to ensure that resolvers place the authoritative NS RRset preferentially in their cache is that the TTLs may differ between the parent and child side of the zone cut.
 Some DNS Top Level Domains (TLDs) only support long fixed TTLs in their delegation NS sets.
-This inhibits a child zone owner's ability to make more rapid changes to their nameserver configuration using a shorter TTL, if resolvers have no systematic mechanism to observe and cache the child NS RRset.
+This inhibits a child zone owner's ability to make more rapid changes to their nameserver configuration using a shorter TTL, if resolvers have no systematic mechanism to observe and cache the child NS RRset.[^1]
 
-:[//] # (Willem: The other way around is also possible. A zone owner may prefer to have longer TTLs than the referral; for example root-servers.net.)
-
-
-:[//] # (Willem: Another motivation)
+[^1]: The other way around is also possible. A zone owner may prefer to have longer TTLs than the referral; for example root-servers.net.
+{Willem}
 
 A child zone's delegation still needs to be periodically revalidated at the parent to make sure that the parent zone has not legitimately re-delegated the zone to a different set of nameservers, or even removed the delegation.
 Otherwise, resolvers that refresh the TTL of a child NS RRset on subsequent queries or due to pre-fetching, may cling to those nameservers long after they have been re-delegated elsewhere.
@@ -183,14 +181,16 @@ Upgrading NS RRset Credibility  {#upgrade-ns}
     Outstanding validation queries for "glue" that do match names in the authoritative NS RRset must be left running to completion.
     They do not need to be re-queried after reception of the authoritative NS RRset (see [](#upgrade-addresses)).
 
-    [//]: # (Ralph: fwiw, I'm ok with completely dropping the next items. Let's keep this simple.)
-
--   Resolvers may choose to delay the response to the triggering query until both the triggering query and the validation query have been answered.
+-   Resolvers may choose to delay the response to the triggering query until both the triggering query and the validation query have been answered.[^2]
     In practice, we expect many implementations may answer the triggering query in advance of the validation query for performance reasons.
     An additional reason is that there are unfortunately a number of nameservers in the field that (incorrectly) fail to properly answer explicit queries for zone apex NS records, and thus the revalidation logic may need to be applied lazily and opportunistically to deal with them.
     In cases where the delegated nameservers respond incorrectly to an NS query, the resolver should abandon this algorithm for the zone in question and fall back to using only the information from the parent's referral response.
 
 -   If the resolver chooses to delay the response, and there are no nameserver names in common between the child's apex NS RRset and the parent's delegation NS RRset, then the responses received from forwarding the triggering query to the parent's delegated nameservers should be discarded after validation, and this query should be forwarded again to the child's apex nameservers.
+
+[^2]: fwiw, I'm ok with completely dropping the last two items. Let's keep this simple.
+{Ralph}
+
 
 Upgrading A and AAAA RRset Credibility  {#upgrade-addresses}
 ======================================
