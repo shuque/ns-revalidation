@@ -164,14 +164,13 @@ A common reason that zone owners want to ensure that resolvers place the authori
 Some DNS Top Level Domains (TLDs) only support long fixed TTLs in their delegation NS sets.
 This inhibits a child zone owner's ability to make more rapid changes to their nameserver configuration using a shorter TTL, if resolvers have no systematic mechanism to observe and cache the child NS RRset.
 
-[^1]
+Similarly, a child zone owner may also choose to have longer TTLs in their delegation NS sets and address records to decrease the attack window for cache poisoning attacks.
+For example, at the time of writing, root-servers.net has a TTL of 6 weeks for the root server identifier address records, where the TTL in the priming response is 6 days.
 
 A child zone's delegation still needs to be periodically revalidated at the parent to make sure that the parent zone has not legitimately re-delegated the zone to a different set of nameservers, or even removed the delegation.
 Otherwise, resolvers that refresh the TTL of a child NS RRset on subsequent queries or due to pre-fetching, may cling to those nameservers long after they have been re-delegated elsewhere.
 This leads to the second recommendation in this document, "Delegation Revalidation" - Resolvers should record the TTL of the parent's delegating NS RRset, and use it to trigger a revalidation action.
 Attacks exploiting lack of this revalidation have been described in {{GHOST1}}, {{GHOST2}}.
-
-[^1]: The other way around is also possible. A zone owner may prefer to have longer TTLs than the referral; for example root-servers.net.
 
 Upgrading NS RRset Credibility  {#upgrade-ns}
 ==============================
