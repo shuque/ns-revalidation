@@ -146,6 +146,7 @@ Motivation                      {#motivation}
 There is wide variability in the behavior of deployed DNS resolvers today with respect to how they process delegation records.
 Some of them prefer the parent NS set, some prefer the child, and for others, what they preferentially cache depends on the dynamic state of queries and responses they have processed.
 This document aims to bring more commonality and predictability by standardizing the behavior in a way that comports with the DNS protocol.
+Another goal is to improve DNS security.
 
 The delegation NS RRset at the bottom of the parent zone and the apex NS RRset in the child zone are unsynchronized in the DNS protocol.
 {{RFC1034}} Section 4.2.2 says "The administrators of both zones should insure that the NS and glue RRs which mark both sides of the cut are consistent and remain so.".
@@ -251,6 +252,20 @@ This document includes no request to IANA.
 
 Security Considerations         {#Security}
 =======================
+In {{DNS-CACHE-INJECTIONS}} an overview is given of 18 cache poisoning attacks from which 13 can be remedied with delegation revalidation.
+The paper provides recommendations for handling records in DNS response with respect to an earlier version of the idea presented in this document{{I-D.wijngaards-dnsext-resolver-side-mitigation}}.
+
+Referral response NS RRsets and glue, and the additional addresses from authoritative NS RRset responses (such as the root priming response), are not protected with DNSSEC signatures.
+An attacker that is able to alter the unsigned A and AAAA RRsets in the additional section of referral and authoritative NS RRset responses, can fool a resolver into taking addresses under the control of the attacker to be authoritative for the zone.
+Such an attacker can redirect all traffic to the zone (of the referral or authoritative NS RRset response) to a rogue name server.
+
+A rogue name server can view all queries from the resolver to that zone and alter all unsigned parts of responses, such as the parent side NS RRsets and glue of further referral responses.
+Resolvers following referrals from a rogue name server, that do not revalidate those referral responses, can subsequently be fooled into taking addresses under the control of the attacker to be authoritative for those delegations as well.
+The higher up the DNS tree, the more impact such an attack has.
+In case of non DNSSEC validating resolvers, an attacker controlling a rogue name server for the root has potentially complete control over the entire domain name space and can alter all unsigned parts undetected.
+
+Revalidating referral and authoritative NS RRsets responses enables to defend against the above described attack with DNSSEC signed infrastructure RRsets.
+Unlike cache poisoning defences that leverage increase entropy to protect the transaction, revalidation of NS RRsets and addresses also provides protection against on-path attacks.
 
 [Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
 However, it is important to implement the steps described in [Delegation Revalidation](#revalidation) at the expiration of the parent's delegating TTL.
