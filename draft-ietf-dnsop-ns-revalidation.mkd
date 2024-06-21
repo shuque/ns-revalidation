@@ -54,6 +54,8 @@ normative:
     RFC1035:
     RFC2181:
     RFC8109:
+    RFC9567:
+    RFC8914:
 
 informative:
     I-D.vixie-dnsext-resimprove:
@@ -184,6 +186,8 @@ Upgrading NS RRset Credibility  {#upgrade-ns}
     Successive queries directed to the same zone will be directed to the nameservers listed in the child's apex, due to the ranking of this answer.
     If the validation query fails, the parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
 
+>   When a resolver detects that the child's apex NS RRset contains different nameservers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD (see {{IANA}}).
+
 -   Additional validation queries for the "glue" resource records of referral responses (if not already authoritatively present in cache) may be sent with the validation query for the NS RRset as well.
     Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
     Successive queries directed to the same zone will be directed to the authoritative values for the names of the NS RRset in the referral response.
@@ -247,12 +251,18 @@ However, when re-delegation or take-down occurs, a re-validating cache will disc
 IANA Considerations             {#IANA}
 ===================
 
-This document includes no request to IANA.
+IANA is requested to assign a value to the "Extended DNS Error Codes" registry {{RFC8914}}.
+
+|-----------|----------------------------|-----------------|
+| INFO-CODE | Purpose                    | Reference       |
+|-----------|:---------------------------|-----------------|
+| TBD       | referral NS RRset mismatch | [this document] |
+|-----------|----------------------------|-----------------|
 
 Security Considerations         {#Security}
 =======================
 In {{DNS-CACHE-INJECTIONS}} an overview is given of 18 cache poisoning attacks from which 13 can be remedied with delegation revalidation.
-The paper provides recommendations for handling records in DNS response with respect to an earlier version of the idea presented in this document{{I-D.wijngaards-dnsext-resolver-side-mitigation}}.
+The paper provides recommendations for handling records in DNS response with respect to an earlier version of the idea presented in this document {{I-D.wijngaards-dnsext-resolver-side-mitigation}}.
 
 Referral response NS RRsets and glue, and the additional addresses from authoritative NS RRset responses (such as the root priming response), are not protected with DNSSEC signatures.
 An attacker that is able to alter the unsigned A and AAAA RRsets in the additional section of referral and authoritative NS RRset responses, can fool a resolver into taking addresses under the control of the attacker to be authoritative for the zone.
