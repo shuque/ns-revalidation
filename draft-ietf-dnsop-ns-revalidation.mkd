@@ -202,7 +202,7 @@ Successive queries directed to the same zone will be directed to the nameservers
 If the validation query fails, the parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
 
 The triggering query to the child may contain the NS RRset in the authority section as well.
-This NS RRset however has a lower trustworthiness than the set from the direct query, so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query will be stored in the cache eventually.
+This NS RRset however has a lower trustworthiness than the set from the direct query {{Section 5.4.1 of RFC2181}}, so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query will be stored in the cache eventually.
 
 When a resolver detects that the child's apex NS RRset contains different nameservers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD {{IANA}}.
 
