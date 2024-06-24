@@ -60,6 +60,7 @@ normative:
     RFC9567:
 
 informative:
+    I-D.fujiwara-dnsop-resolver-update:
     I-D.vixie-dnsext-resimprove:
     I-D.wijngaards-dnsext-resolver-side-mitigation:
     GHOST1:
@@ -160,9 +161,9 @@ This document aims to bring more commonality and predictability by standardizing
 Another goal is to improve DNS security.
 
 The delegation NS RRset at the bottom of the parent zone and the apex NS RRset in the child zone are unsynchronized in the DNS protocol.
-{{RFC1034}} Section 4.2.2 says "The administrators of both zones should insure that the NS and glue RRs which mark both sides of the cut are consistent and remain so.".
+{{Section 4.2.2 of RFC1034}} says "The administrators of both zones should insure that the NS and glue RRs which mark both sides of the cut are consistent and remain so.".
 But for a variety of reasons they could not be.
-Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative glue {{RFC2181}}, Section 5.4.1. "Ranking data", and Section 6.1. "Zone authority").
+Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative glue ({{Sections 5.4.1 and 6.1 of RFC2181}}).
 Hence the NS RRset "below the zone cut" should immediately replace the parent's delegating NS RRset in cache when an iterative caching DNS resolver crosses a zone boundary.
 However, this can only happen if (1) the resolver receives the authoritative NS RRset in the Authority section of a response from the child zone, which is not mandatory, or (2) if the resolver explicitly issues an NS RRset query to the child zone as part of its iterative resolution algorithm.
 In the absence of this, it is possible for an iterative caching resolver to never learn the authoritative NS RRset for a zone, unless a downstream client of the resolver explicitly issues such an NS query, which is not something that normal enduser applications do, and thus cannot be relied upon to occur with any regularity.
@@ -287,6 +288,10 @@ In case of non DNSSEC validating resolvers, an attacker controlling a rogue name
 Revalidating referral and authoritative NS RRset responses enables to defend against the above described attack with DNSSEC signed infrastructure RRsets.
 Unlike cache poisoning defences that leverage increase entropy to protect the transaction, revalidation of NS RRsets and addresses also provides protection against on-path attacks.
 
+Since December 6, 2023, the root zone contains a DNSSEC signed cryptographic message digest {{RFC8976}}{{ROOT-ZONEMD}}, covering all root zone data.
+This includes all non-authoritative data such as the A and AAAA RRsets for the IP addresses of the root server identifiers, as well as the NS RRsets and glue that make up the delegations.
+A root zone local to the resolver {{RFC8806}} with a verified and validated ZONEMD RRset, would provide protection similarly strong to revalidating the root and the top level domains.
+
 Cache poisoning protection
 --------------------------
 
@@ -295,7 +300,7 @@ The paper provides recommendations for handling records in DNS response with res
 
 [Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
 However, it is important to implement the steps described in [Delegation Revalidation](#revalidation) at the expiration of the parent's delegating TTL.
-Otherwise, the operator of a malicious child zone, originally delegated to, but subsequently delegated away from, can cause resolvers that refresh TTLs on subsequent NS set queries, or that pre-fetch NS queries, to never learn of the redelegated zone.
+Otherwise, the operator of a malicious child zone, originally delegated to, but subsequently delegated away from, can cause resolvers that refresh TTLs on subsequent NS set queries, or that pre-fetch NS queries, to never learn of the redelegated zone {{GHOST1}}, {{GHOST2}}.
 
 Other considerations
 --------------------
@@ -304,9 +309,10 @@ A software implementation may consider to revalidate only the higher layers of t
 For example only revalidate the root NS and associated address RRsets, or only revalidate the root and the Top Level Domain (TLD) NS and associated address RRsets.
 Another reason to only revalidate layers higher up the DNS tree, is because their management is likely to be a principal activity of the operators managing those layers and as a consequence, the child-side NS RRsets are likely to be of good quality.
 
-Since December 6, 2023, the root zone contains a DNSSEC signed cryptographic message digest {{RFC8976}}{{ROOT-ZONEMD}}, covering all root zone data.
-This includes all non-authoritative data such as the A and AAAA RRsets for the IP addresses of the root server identifiers, as well as the NS RRsets and glue that make up the delegations.
-A root zone local to the resolver {{RFC8806}} with a verified and validated ZONEMD RRset, would provide protection similarly strong to revalidating the root and the top level domains.
+Some, so called parent centric, resolvers do not adhere to {{Sections 5.4.1 and 6.1 of RFC2181}}, and only use the non-authoritative parent side NS RRsets and glue returned in referral responses for contacting authoritative name servers {{I-D.fujiwara-dnsop-resolver-update}}.
+As a consequence, they are not susceptible to many of the cache poisoning attacks enumerated in {{DNS-CACHE-INJECTIONS}} that are based upon the relative trustworthiness of DNS data.
+Parent centric resolvers are also not susceptible to the GHOST domain attacks {{GHOST1}}, {{GHOST2}}.
+Parent centric resolvers will however never benefit from DNSSEC protection of infrastructure RRsets and are susceptible to query redirection attacks (see {{impact}}).
 
 --- back
 
