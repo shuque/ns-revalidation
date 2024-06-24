@@ -335,10 +335,9 @@ Implementation status           {#implementation-status}
 
 **Note to the RFC Editor**: please remove this entire appendix before publication.
 
-* The Knot Resolver software revalidates the priming response as part of priming the root zone since version 1.5.1 (released December 12, 2017)
-
 * The Unbound resolver software has delegation revalidation as described in this document implemented since version 1.1 (released August 29, 2008).
   It is enabled with a configuration option `harden-referral-path: yes` which is disabled by default.
 
   "Redhat Enterprise Linux has been running Unbound with the `harden-referral-path:` option set to `yes` for years without problems", as mentioned by Paul Wouters during dnsop workgroup session at the IETF 119.
+* The Knot Resolver software revalidates the priming response as part of priming the root zone since version 1.5.1 (released December 12, 2017)
 
