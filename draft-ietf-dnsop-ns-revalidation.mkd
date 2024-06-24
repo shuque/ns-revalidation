@@ -312,6 +312,7 @@ Otherwise, the operator of a malicious child zone, originally delegated to, but 
 Other considerations
 --------------------
 Revalidating referral and authoritative NS RRset responses will induce more traffic from the resolver to the authoritative name servers.
+The traffic increase may be substantial if the address RRsets for the names in the NS RRset's RDATA were provided non-authoritatively (as glue or as additional addresses) and need revalidation too.
 A software implementation may consider to revalidate only the higher layers of the domain name space where it has the highest impact (see {{impact}}).
 For example only revalidate the root NS and associated address RRsets, or only revalidate the root and the Top Level Domain (TLD) NS and associated address RRsets.
 Another reason to only revalidate layers higher up the DNS tree, is because their management is likely to be a principal activity of the operators managing those layers and as a consequence, the child-side NS RRsets are likely to be of good quality.
