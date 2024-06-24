@@ -262,7 +262,7 @@ IANA is requested to assign a value to the "Extended DNS Error Codes" registry {
 Security and Privacy Considerations     {#Security}
 ===================================
 
-DNSSEC protection of infrastructure data
+DNSSEC protection of infrastructure data        {#impact}
 ----------------------------------------
 
 Referral response NS RRsets and glue, and the additional addresses from authoritative NS RRset responses (such as the root priming response), are not protected with DNSSEC signatures.
@@ -275,7 +275,7 @@ Resolvers following referrals from a rogue name server, that do not revalidate t
 The higher up the DNS tree, the more impact such an attack has.
 In case of non DNSSEC validating resolvers, an attacker controlling a rogue name server for the root has potentially complete control over the entire domain name space and can alter all unsigned parts undetected.
 
-Revalidating referral and authoritative NS RRsets responses enables to defend against the above described attack with DNSSEC signed infrastructure RRsets.
+Revalidating referral and authoritative NS RRset responses enables to defend against the above described attack with DNSSEC signed infrastructure RRsets.
 Unlike cache poisoning defences that leverage increase entropy to protect the transaction, revalidation of NS RRsets and addresses also provides protection against on-path attacks.
 
 Cache poisoning protection
@@ -287,6 +287,13 @@ The paper provides recommendations for handling records in DNS response with res
 [Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
 However, it is important to implement the steps described in [Delegation Revalidation](#revalidation) at the expiration of the parent's delegating TTL.
 Otherwise, the operator of a malicious child zone, originally delegated to, but subsequently delegated away from, can cause resolvers that refresh TTLs on subsequent NS set queries, or that pre-fetch NS queries, to never learn of the redelegated zone.
+
+Other considerations
+--------------------
+Revalidating referral and authoritative NS RRset responses will induce more traffic from the resolver to the authoritative name servers.
+A software implementation may consider to revalidate only the higher layers of the domain name space where it has the highest impact (see {{impact}}).
+For example only revalidate the root NS and associated address RRsets, or only revalidate the root and the Top Level Domain (TLD) NS and associated address RRsets.
+Another reason to only revalidate layers higher up the DNS tree, is because their management is likely to be a principal activity of the operators managing those layers and as a consequence, the child-side NS RRsets are likely to be of good quality.
 
 --- back
 
