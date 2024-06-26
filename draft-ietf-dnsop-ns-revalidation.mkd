@@ -151,7 +151,7 @@ Another goal is to improve DNS security.
 The delegation NS RRset at the bottom of the parent zone and the apex NS RRset in the child zone are unsynchronized in the DNS protocol.
 {{Section 4.2.2 of RFC1034}} says "The administrators of both zones should insure that the NS and glue RRs which mark both sides of the cut are consistent and remain so.".
 But for a variety of reasons they could not be.
-Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative glue ({{Sections 5.4.1 and 6.1 of RFC2181}}).
+Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative glue ({{Sections 5.4.1 (Ranking data) and 6.1 (Zone authority) of RFC2181}}).
 Hence the NS RRset "below the zone cut" should immediately replace the parent's delegating NS RRset in cache when an iterative caching DNS resolver crosses a zone boundary.
 However, this can only happen if (1) the resolver receives the authoritative NS RRset in the Authority section of a response from the child zone, which is not mandatory, or (2) if the resolver explicitly issues an NS RRset query to the child zone as part of its iterative resolution algorithm.
 In the absence of this, it is possible for an iterative caching resolver to never learn the authoritative NS RRset for a zone, unless a downstream client of the resolver explicitly issues such an NS query, which is not something that normal enduser applications do, and thus cannot be relied upon to occur with any regularity.
