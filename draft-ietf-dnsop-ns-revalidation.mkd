@@ -189,6 +189,9 @@ Positive responses to this validation query will be cached with an authoritative
 Successive queries directed to the same zone will be directed to the nameservers listed in the child's apex, due to the ranking of this answer.
 If the validation query fails, the parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
 
+The triggering query to the child may contain the NS RRset in the authority section as well.
+This NS RRset however has a lower trustworthiness than the set from the direct query ({{Section 5.4.1 of RFC2181}}), so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query will be stored in the cache eventually.
+
 Additional validation queries for the "glue" resource records of referral responses (if not already authoritatively present in cache) may be sent with the validation query for the NS RRset as well.
 Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
 Successive queries directed to the same zone will be directed to the authoritative values for the names of the NS RRset in the referral response.
