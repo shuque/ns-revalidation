@@ -54,6 +54,8 @@ normative:
     RFC1035:
     RFC2181:
     RFC8109:
+    RFC8914:
+    RFC9567:
 
 informative:
     I-D.vixie-dnsext-resimprove:
@@ -192,15 +194,17 @@ If the validation query fails, the parent NS RRset will remain the one with the 
 The triggering query to the child may contain the NS RRset in the authority section as well.
 This NS RRset however has a lower trustworthiness than the set from the direct query ({{Section 5.4.1 of RFC2181}}), so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query will be stored in the cache eventually.
 
+When a resolver detects that the child's apex NS RRset contains different nameservers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD {{IANA}}.
+
 Additional validation queries for the "glue" resource records of referral responses (if not already authoritatively present in cache) may be sent with the validation query for the NS RRset as well.
 Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
-Successive queries directed to the same zone will be directed to the authoritative values for the names of the NS RRset in the referral response.
+Successive queries directed to the same zone will be directed to the authoritative nameservers denoted in the referral response.
 
 The names from the NS RRset from a validating NS query may differ from the names in NS RRset in the referral response.
 Outstanding validation queries for "glue" that do not match names in the authoritative NS RRset may be discarded, or they may be left running to completion.
 Their result will no longer be used in queries for the zone.
-Outstanding validation queries for "glue" that do match names in the authoritative NS RRset MUST be left running to completion.
-They do not need to be re-queried after reception of the authoritative NS RRset (see [](#upgrade-addresses)).
+Outstanding validation queries for "glue" that do match names in the authoritative NS RRset must be left running to completion.
+They do not need to be re-queried after receipt of the authoritative NS RRset (see [](#upgrade-addresses)).
 
 Resolvers may choose to delay the response to the triggering query until both the triggering query and the validation query have been answered.
 In practice, we expect many implementations may answer the triggering query in advance of the validation query for performance reasons.
@@ -255,7 +259,13 @@ However, when re-delegation or take-down occurs, a re-validating cache will disc
 IANA Considerations             {#IANA}
 ===================
 
-This document includes no request to IANA.
+IANA is requested to assign a value to the "Extended DNS Error Codes" registry {{RFC8914}}.
+
+|-----------|----------------------------|-------------------|
+| INFO-CODE | Purpose                    | Reference         |
+|-----------|:---------------------------|-------------------|
+| TBD       | referral NS RRset mismatch | \[this document\] |
+|-----------|----------------------------|-------------------|
 
 Security Considerations         {#Security}
 =======================
