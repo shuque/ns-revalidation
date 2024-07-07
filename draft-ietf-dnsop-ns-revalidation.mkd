@@ -299,3 +299,16 @@ This behavior has been implemented in the Unbound DNS resolver via the "harden-r
 The combination of child NS fetch and revalidating the child delegation was originally proposed in {{I-D.vixie-dnsext-resimprove}}, by Paul Vixie, Rodney Joffe, and Frederico Neves.
 
 The authors would like to thank Ralph Dolmans who was an early collaborator on this work, as well as the many members of the IETF DNS Operations Working Group for helpful comments and discussion.
+
+
+Implementation status           {#implementation-status}
+=====================
+
+**Note to the RFC Editor**: please remove this entire appendix before publication.
+
+* The Unbound resolver software has delegation revalidation as described in this document implemented since version 1.1 (released August 29, 2008).
+  It is enabled with a configuration option `harden-referral-path: yes` which is disabled by default.
+
+  "Redhat Enterprise Linux has been running Unbound with the `harden-referral-path:` option set to `yes` for years without problems", as mentioned by Paul Wouters during dnsop workgroup session at the IETF 119.
+* The Knot Resolver software revalidates the priming response as part of priming the root zone since version 1.5.1 (released December 12, 2017)
+
