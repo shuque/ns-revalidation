@@ -279,9 +279,9 @@ Such an attacker can redirect all traffic to the zone (of the referral or author
 A rogue name server can view all queries from the resolver to that zone and alter all unsigned parts of responses, such as the parent side NS RRsets and glue of further referral responses.
 Resolvers following referrals from a rogue name server, that do not revalidate those referral responses, can subsequently be fooled into taking addresses under the control of the attacker to be authoritative for those delegations as well.
 The higher up the DNS tree, the more impact such an attack has.
-In case of non DNSSEC validating resolvers, an attacker controlling a rogue name server for the root has potentially complete control over the entire domain name space and can alter all unsigned parts undetected.
+An attacker controlling a rogue name server for the root has potentially complete control over the entire domain name space and can alter all unsigned parts undetected.
 
-Revalidating referral and authoritative NS RRsets responses enables to defend against the above described attack with DNSSEC signed infrastructure RRsets.
+Revalidating referral and authoritative NS RRset responses enables to defend against the above described attack with DNSSEC signed infrastructure RRsets.
 Unlike cache poisoning defences that leverage increase entropy to protect the transaction, revalidation of NS RRsets and addresses also provides protection against on-path attacks.
 
 [Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
