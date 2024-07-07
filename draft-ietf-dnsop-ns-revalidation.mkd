@@ -54,6 +54,8 @@ normative:
     RFC1035:
     RFC2181:
     RFC8109:
+    RFC8806:
+    RFC8976:
 
 informative:
     I-D.fujiwara-dnsop-resolver-update:
@@ -122,6 +124,13 @@ informative:
           -
             name: Michael Waidner
             ins: M. Waidner
+    ROOT-ZONEMD:
+        target: https://lists.dns-oarc.net/pipermail/dns-operations/2023-December/022388.html
+        title: "Root zone operational announcement: introducing ZONEMD for the root zone"
+        author:
+          -
+            name: Duane Wessels
+            ins: D. Wessels
 
 --- abstract
 
@@ -266,6 +275,10 @@ In case of non DNSSEC validating resolvers, an attacker controlling a rogue name
 
 Revalidating referral and authoritative NS RRsets responses enables to defend against the above described attack with DNSSEC signed infrastructure RRsets.
 Unlike cache poisoning defences that leverage increase entropy to protect the transaction, revalidation of NS RRsets and addresses also provides protection against on-path attacks.
+
+Since December 6, 2023, the root zone contains a DNSSEC signed cryptographic message digest {{RFC8976}}{{ROOT-ZONEMD}}, covering all root zone data.
+This includes all non-authoritative data such as the A and AAAA RRsets for the IP addresses of the root server identifiers, as well as the NS RRsets and glue that make up the delegations.
+A root zone local to the resolver {{RFC8806}} with a verified and validated ZONEMD RRset, would provide protection similarly strong to revalidating the root and the top level domains.
 
 [Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
 However, it is important to implement the steps described in [Delegation Revalidation](#revalidation) at the expiration of the parent's delegating TTL.
