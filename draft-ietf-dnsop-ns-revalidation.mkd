@@ -2,7 +2,7 @@
 title: Delegation Revalidation by DNS Resolvers
 abbrev: DNS Delegation Revalidation
 docname: draft-ietf-dnsop-ns-revalidation-07
-date: 2024-06-28
+date: 2024-07-08
 
 ipr: trust200902
 submissiontype: IETF
@@ -55,7 +55,9 @@ normative:
     RFC2181:
     RFC8109:
     RFC8806:
+    RFC8914:
     RFC8976:
+    RFC9567:
 
 informative:
     I-D.fujiwara-dnsop-resolver-update:
@@ -134,7 +136,7 @@ informative:
 
 --- abstract
 
-This document recommends improved DNS {{RFC1034}} {{RFC1035}} resolver behavior with respect to the processing of Name Server (NS) resource record sets (RRset) during iterative resolution.
+This document recommends improved DNS {{RFC1034}} {{RFC1035}} resolver behavior with respect to the processing of Name Server (NS) resource record (RR) sets (RRsets) during iterative resolution.
 When following a referral response from an authoritative server to a child zone, DNS resolvers should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
 The (A and AAAA) address RRsets in the additional section from referral responses and authoritative NS answers for the names of the NS RRset, should similarly be re-queried and used to replace the entries with the lower trustworthiness ranking in cache.
 Resolvers should also periodically revalidate the child delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
@@ -164,9 +166,9 @@ This document aims to bring more commonality and predictability by standardizing
 Another goal is to improve DNS security.
 
 The delegation NS RRset at the bottom of the parent zone and the apex NS RRset in the child zone are unsynchronized in the DNS protocol.
-{{RFC1034}} Section 4.2.2 says "The administrators of both zones should insure that the NS and glue RRs which mark both sides of the cut are consistent and remain so.".
+{{Section 4.2.2 of RFC1034}} says "The administrators of both zones should insure that the NS and glue RRs which mark both sides of the cut are consistent and remain so.".
 But for a variety of reasons they could not be.
-Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative glue {{RFC2181}}, Section 5.4.1. "Ranking data", and Section 6.1. "Zone authority").
+Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative glue ({{Sections 5.4.1 (Ranking data) and 6.1 (Zone authority) of RFC2181}}).
 Hence the NS RRset "below the zone cut" should immediately replace the parent's delegating NS RRset in cache when an iterative caching DNS resolver crosses a zone boundary.
 However, this can only happen if (1) the resolver receives the authoritative NS RRset in the Authority section of a response from the child zone, which is not mandatory, or (2) if the resolver explicitly issues an NS RRset query to the child zone as part of its iterative resolution algorithm.
 In the absence of this, it is possible for an iterative caching resolver to never learn the authoritative NS RRset for a zone, unless a downstream client of the resolver explicitly issues such an NS query, which is not something that normal enduser applications do, and thus cannot be relied upon to occur with any regularity.
@@ -202,14 +204,16 @@ If the validation query fails, the parent NS RRset will remain the one with the 
 The triggering query to the child may contain the NS RRset in the authority section as well.
 This NS RRset however has a lower trustworthiness than the set from the direct query ({{Section 5.4.1 of RFC2181}}), so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query will be stored in the cache eventually.
 
-Additional validation queries for the "glue" resource records of referral responses (if not already authoritatively present in cache) may be sent with the validation query for the NS RRset as well.
+When a resolver detects that the child's apex NS RRset contains different nameservers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD {{IANA}}.
+
+Additional validation queries for the "glue" address RRs of referral responses (if not already authoritatively present in cache) SHOULD be sent with the validation query for the NS RRset as well.
 Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
-Successive queries directed to the same zone will be directed to the authoritative values for the names of the NS RRset in the referral response.
+Successive queries directed to the same zone will be directed to the authoritative nameservers denoted in the referral response.
 
 The names from the NS RRset from a validating NS query may differ from the names in NS RRset in the referral response.
-Outstanding validation queries for "glue" that do not match names in the authoritative NS RRset may be discarded, or they may be left running to completion.
+Outstanding validation queries for "glue" address RRs that do not match names in the authoritative NS RRset may be discarded, or they may be left running to completion.
 Their result will no longer be used in queries for the zone.
-Outstanding validation queries for "glue" that do match names in the authoritative NS RRset MUST be left running to completion.
+Outstanding validation queries for "glue" address RRs that do match names in the authoritative NS RRset MUST be left running to completion.
 They do not need to be re-queried after reception of the authoritative NS RRset (see [](#upgrade-addresses)).
 
 Resolvers may choose to delay the response to the triggering query until both the triggering query and the validation query have been answered.
@@ -265,12 +269,19 @@ However, when re-delegation or take-down occurs, a re-validating cache will disc
 IANA Considerations             {#IANA}
 ===================
 
-This document includes no request to IANA.
+IANA is requested to assign a value to the "Extended DNS Error Codes" registry {{RFC8914}}.
 
-Security Considerations         {#Security}
-=======================
-In {{DNS-CACHE-INJECTIONS}} an overview is given of 18 cache poisoning attacks from which 13 can be remedied with delegation revalidation.
-The paper provides recommendations for handling records in DNS response with respect to an earlier version of the idea presented in this document{{I-D.wijngaards-dnsext-resolver-side-mitigation}}.
+|-----------|----------------------------|-------------------|
+| INFO-CODE | Purpose                    | Reference         |
+|-----------|:---------------------------|-------------------|
+| TBD       | referral NS RRset mismatch | \[this document\] |
+|-----------|----------------------------|-------------------|
+
+Security and Privacy Considerations     {#Security}
+===================================
+
+DNSSEC protection of infrastructure data        {#impact}
+----------------------------------------
 
 Referral response NS RRsets and glue, and the additional addresses from authoritative NS RRset responses (such as the root priming response), are not protected with DNSSEC signatures.
 An attacker that is able to alter the unsigned A and AAAA RRsets in the additional section of referral and authoritative NS RRset responses, can fool a resolver into taking addresses under the control of the attacker to be authoritative for the zone.
@@ -288,10 +299,18 @@ Since December 6, 2023, the root zone contains a DNSSEC signed cryptographic mes
 This includes all non-authoritative data such as the A and AAAA RRsets for the IP addresses of the root server identifiers, as well as the NS RRsets and glue that make up the delegations.
 A root zone local to the resolver {{RFC8806}} with a verified and validated ZONEMD RRset, would provide protection similarly strong to revalidating the root and the top level domains.
 
+Cache poisoning protection
+--------------------------
+
+In {{DNS-CACHE-INJECTIONS}} an overview is given of 18 cache poisoning attacks from which 13 can be remedied with delegation revalidation.
+The paper provides recommendations for handling records in DNS response with respect to an earlier version of the idea presented in this document {{I-D.wijngaards-dnsext-resolver-side-mitigation}}.
+
 [Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
 However, it is important to implement the steps described in [Delegation Revalidation](#revalidation) at the expiration of the parent's delegating TTL.
-Otherwise, the operator of a malicious child zone, originally delegated to, but subsequently delegated away from, can cause resolvers that refresh TTLs on subsequent NS set queries, or that pre-fetch NS queries, to never learn of the redelegated zone.
+Otherwise, the operator of a malicious child zone, originally delegated to, but subsequently delegated away from, can cause resolvers that refresh TTLs on subsequent NS set queries, or that pre-fetch NS queries, to never learn of the redelegated zone {{GHOST1}}, {{GHOST2}}.
 
+Other considerations
+--------------------
 Some resolvers do not adhere to {{Sections 5.4.1 and 6.1 of RFC2181}}, and only use the non-authoritative parent side NS RRsets and glue returned in referral responses for contacting authoritative name servers {{I-D.fujiwara-dnsop-resolver-update}}.
 As a consequence, they are not susceptible to many of the cache poisoning attacks enumerated in {{DNS-CACHE-INJECTIONS}} that are based upon the relative trustworthiness of DNS data.
 Such resolvers are also not susceptible to the GHOST domain attacks {{GHOST1}}, {{GHOST2}}.
