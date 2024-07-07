@@ -320,7 +320,6 @@ As a consequence, they are not susceptible to many of the cache poisoning attack
 Such resolvers are also not susceptible to the GHOST domain attacks {{GHOST1}}, {{GHOST2}}.
 Such resolvers will however never benefit from DNSSEC protection of infrastructure RRsets and are susceptible to query redirection attacks.
 
-
 --- back
 
 Acknowledgements                {#Acknowledgements}
