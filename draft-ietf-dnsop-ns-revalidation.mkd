@@ -196,7 +196,7 @@ The names from the NS RRset from a validating NS query may differ from the names
 Outstanding validation queries for "glue" that do not match names in the authoritative NS RRset be discarded, or they may be left running to completion.
 Their result will no longer be used in queries for the zone.
 Outstanding validation queries for "glue" that do match names in the authoritative NS RRset must be left running to completion.
-They do not need to be re-queried after reception of the authoritative NS RRset (see [](#upgrade-addresses)).
+They do not need to be re-queried after receipt of the authoritative NS RRset (see [](#upgrade-addresses)).
 
 Resolvers may choose to delay the response to the triggering query until both the triggering query and the validation query have been answered.
 In practice, we expect many implementations may answer the triggering query in advance of the validation query for performance reasons.
