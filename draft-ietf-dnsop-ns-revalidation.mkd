@@ -56,6 +56,7 @@ normative:
     RFC8109:
 
 informative:
+    I-D.fujiwara-dnsop-resolver-update:
     I-D.vixie-dnsext-resimprove:
     I-D.wijngaards-dnsext-resolver-side-mitigation:
     GHOST1:
@@ -269,6 +270,11 @@ Unlike cache poisoning defences that leverage increase entropy to protect the tr
 [Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
 However, it is important to implement the steps described in [Delegation Revalidation](#revalidation) at the expiration of the parent's delegating TTL.
 Otherwise, the operator of a malicious child zone, originally delegated to, but subsequently delegated away from, can cause resolvers that refresh TTLs on subsequent NS set queries, or that pre-fetch NS queries, to never learn of the redelegated zone.
+
+Some resolvers do not adhere to {{Sections 5.4.1 and 6.1 of RFC2181}}, and only use the non-authoritative parent side NS RRsets and glue returned in referral responses for contacting authoritative name servers {{I-D.fujiwara-dnsop-resolver-update}}.
+As a consequence, they are not susceptible to many of the cache poisoning attacks enumerated in {{DNS-CACHE-INJECTIONS}} that are based upon the relative trustworthiness of DNS data.
+Such resolvers are also not susceptible to the GHOST domain attacks {{GHOST1}}, {{GHOST2}}.
+Such resolvers will however never benefit from DNSSEC protection of infrastructure RRsets and are susceptible to query redirection attacks.
 
 --- back
 
