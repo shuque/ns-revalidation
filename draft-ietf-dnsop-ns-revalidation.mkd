@@ -190,7 +190,7 @@ When a resolver detects that the child's apex NS RRset contains different namese
 
 Additional validation queries for the "glue" resource records of referral responses (if not already authoritatively present in cache) may be sent with the validation query for the NS RRset as well.
 Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
-Successive queries directed to the same zone will be directed to the authoritative values for the names of the NS RRset in the referral response.
+Successive queries directed to the same zone will be directed to the authoritative nameservers denoted in the referral response.
 
 The names from the NS RRset from a validating NS query may differ from the names in NS RRset in the referral response.
 Outstanding validation queries for "glue" that do not match names in the authoritative NS RRset be discarded, or they may be left running to completion.
