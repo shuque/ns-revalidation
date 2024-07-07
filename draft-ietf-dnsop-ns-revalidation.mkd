@@ -311,9 +311,7 @@ Otherwise, the operator of a malicious child zone, originally delegated to, but 
 
 Other considerations
 --------------------
-A software implementation may consider to revalidate only the higher layers of the domain name space where it has the highest impact (see {{impact}}).
-For example only revalidate the root NS and associated address RRsets, or only revalidate the root and the Top Level Domain (TLD) NS and associated address RRsets.
-Administration of those layers are more likely to be a key activity of the operators for those layers and as a consequence, the child-side NS RRsets are more likely to be of good quality.
+An implementation may wish to consider limiting revalidation to delegations that cross administrative boundaries such as anywhere in .ip6.arpa and .in-addr.arpa as well as any so-called "public suffix" such as the root zone, top level zones such as ".com" or ".net", and effective top level zones such as ".ad.jp" or ".co.uk".
 
 Some resolvers do not adhere to {{Sections 5.4.1 and 6.1 of RFC2181}}, and only use the non-authoritative parent side NS RRsets and glue returned in referral responses for contacting authoritative name servers {{I-D.fujiwara-dnsop-resolver-update}}.
 As a consequence, they are not susceptible to many of the cache poisoning attacks enumerated in {{DNS-CACHE-INJECTIONS}} that are based upon the relative trustworthiness of DNS data.
