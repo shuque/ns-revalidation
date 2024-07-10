@@ -133,6 +133,31 @@ informative:
           -
             name: Duane Wessels
             ins: D. Wessels
+    SOMMESE:
+        target: https://par.nsf.gov/servlets/purl/10186683
+        title: "When parents and children disagree: Diving into DNS delegation inconsistency"
+        author:
+          -
+            name: Raffaele Sommese
+            ins: R. Sommese
+          -
+            name: Giovane C.M. Moura
+            ins: G.C.M. Moura
+          -
+            name: Mattijs Jonker
+            ins: M.Jonker
+          -
+            name: Roland van Rijswijk-Deij
+            ins: R. van Rijswijk-Deij
+          -
+            name: Alberto Dainotti
+            ins: A. Dainotti
+          -
+            name: K.C. Claffy
+            ins: K.C. Claffy
+          -
+            name: Anna Sperotto
+            ins: A. Sperotto
 
 --- abstract
 
@@ -161,13 +186,13 @@ Motivation                      {#motivation}
 ==========
 
 There is wide variability in the behavior of deployed DNS resolvers today with respect to how they process delegation records.
-Some of them prefer the parent NS set, some prefer the child, and for others, what they preferentially cache depends on the dynamic state of queries and responses they have processed.
+Some of them prefer the parent NS set, some prefer the child, and for others, what they preferentially cache depends on the dynamic state of queries and responses they have processed {{SOMMESE}}.
 This document aims to bring more commonality and predictability by standardizing the behavior in a way that comports with the DNS protocol.
 Another goal is to improve DNS security.
 
 The delegation NS RRset at the bottom of the parent zone and the apex NS RRset in the child zone are unsynchronized in the DNS protocol.
 {{Section 4.2.2 of RFC1034}} says "The administrators of both zones should insure that the NS and glue RRs which mark both sides of the cut are consistent and remain so.".
-But for a variety of reasons they could not be.
+But for a variety of reasons they could not be {{SOMMESE}}.
 Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative glue ({{Sections 5.4.1 (Ranking data) and 6.1 (Zone authority) of RFC2181}}).
 Hence the NS RRset "below the zone cut" should immediately replace the parent's delegating NS RRset in cache when an iterative caching DNS resolver crosses a zone boundary.
 However, this can only happen if (1) the resolver receives the authoritative NS RRset in the Authority section of a response from the child zone, which is not mandatory, or (2) if the resolver explicitly issues an NS RRset query to the child zone as part of its iterative resolution algorithm.
