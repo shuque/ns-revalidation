@@ -212,7 +212,7 @@ What matters is that the supporting chain of delegations from the root to the ow
 
 <t>Re-validation MUST be triggered when delegation meta-data has been cached for a period at most exceeding the delegating NS or DS (if seen) RRset TTL.
 If the corresponding child zone's apex NS RRset TTL is smaller than the delegating NS RRset TTL, revalidation MUST happen at that interval instead.
-However, resolvers SHOULD impose a sensitive minimum TTL floor they are willing to endure to avoid potential computational DoS attacks inflicted by zones with very short TTLs.</t>
+However, resolvers SHOULD impose a sensible minimum TTL floor they are willing to endure to avoid potential computational DoS attacks inflicted by zones with very short TTLs.</t>
 
 <t>In normal operations this meta-data can be quickly re-validated with no further work.
 However, when re-delegation or take-down occurs, a re-validating cache will discover this within one delegation TTL period, allowing the rapid expulsion of old data from the cache.</t>
