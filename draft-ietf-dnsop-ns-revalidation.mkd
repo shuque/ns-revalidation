@@ -175,6 +175,7 @@ This document recommends improved DNS {{RFC1034}} {{RFC1035}} resolver behavior 
 The first recommendation is that resolvers, when following a referral response from an authoritative server to a child zone, should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
 The address records in the additional section from the referral response (as glue) or authoritative NS response that match the names of the NS RRset should similarly be required if they are cached non-authoritatively.
 The authoritative answers from those queries should replace the cached non-authoritative A and AAAA RRsets.
+
 The second recommendation is to revalidate the delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
 
 Terminology
@@ -229,7 +230,7 @@ If the validation query fails, the parent NS RRset will remain the one with the 
 The triggering query to the child may contain the NS RRset in the authority section as well.
 This NS RRset however has a lower trustworthiness than the set from the direct query ({{Section 5.4.1 of RFC2181}}), so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query will be stored in the cache eventually.
 
-When a resolver detects that the child's apex NS RRset contains different nameservers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD {{IANA}}.
+When a resolver detects that the child's apex NS RRset contains different nameservers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD (See {{IANA}}).
 
 Additional validation queries for the "glue" address RRs of referral responses (if not already authoritatively present in cache) SHOULD be sent with the validation query for the NS RRset as well.
 Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
@@ -241,7 +242,7 @@ Their result will no longer be used in queries for the zone.
 Outstanding validation queries for "glue" address RRs that do match names in the authoritative NS RRset MUST be left running to completion.
 They do not need to be re-queried after reception of the authoritative NS RRset (see [](#upgrade-addresses)).
 
-Resolvers may choose to delay the response to the triggering query until both the triggering query and the validation query have been answered.
+Resolvers may choose to delay the response to the triggering query until both the triggering query and the validation queries have been answered.
 In practice, we expect many implementations may answer the triggering query in advance of the validation query for performance reasons.
 An additional reason is that there are unfortunately a number of nameservers in the field that (incorrectly) fail to properly answer explicit queries for zone apex NS records, and thus the revalidation logic may need to be applied lazily and opportunistically to deal with them.
 In cases where the delegated nameservers respond incorrectly to an NS query, the resolver SHOULD abandon this algorithm for the zone in question and fall back to using only the information from the parent's referral response.
@@ -251,7 +252,7 @@ If the resolver chooses to delay the response, and there are no nameserver names
 Upgrading A and AAAA RRset Credibility  {#upgrade-addresses}
 ======================================
 Authoritative responses for a zone's NS RRset at the apex can contain additional addresses.
-A NS RRset validation response is such an example of such responses.
+An NS RRset validation response is an example of such a response.
 A priming response is another example of an authoritative zone's NS RRset response {{RFC8109}}.
 
 Additional addresses in authoritative NS RRset responses SHOULD be validated if they are not already authoritatively in cache.
@@ -328,7 +329,7 @@ Cache poisoning protection
 --------------------------
 
 In {{DNS-CACHE-INJECTIONS}} an overview is given of 18 cache poisoning attacks from which 13 can be remedied with delegation revalidation.
-The paper provides recommendations for handling records in DNS response with respect to an earlier version of the idea presented in this document {{I-D.wijngaards-dnsext-resolver-side-mitigation}}.
+The paper provides recommendations for handling records in DNS responses with respect to an earlier version of the idea presented in this document {{I-D.wijngaards-dnsext-resolver-side-mitigation}}.
 
 [Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
 However, it is important to implement the steps described in [Delegation Revalidation](#revalidation) at the expiration of the parent's delegating TTL.
@@ -336,7 +337,7 @@ Otherwise, the operator of a malicious child zone, originally delegated to, but 
 
 Other considerations
 --------------------
-An implementation may wish to consider limiting revalidation to delegations that cross administrative boundaries such as anywhere in .ip6.arpa and .in-addr.arpa as well as any so-called "public suffix" such as the root zone, top level zones such as ".com" or ".net", and effective top level zones such as ".ad.jp" or ".co.uk".
+An implementation may wish to consider limiting revalidation to delegations that cross administrative boundaries such as anywhere in ".ip6.arpa" and ".in-addr.arpa" as well as any so-called "public suffix" such as the root zone, top level zones such as ".com" or ".net", and effective top level zones such as ".ad.jp" or ".co.uk".
 
 Some resolvers do not adhere to {{Sections 5.4.1 and 6.1 of RFC2181}}, and only use the non-authoritative parent side NS RRsets and glue returned in referral responses for contacting authoritative name servers {{I-D.fujiwara-dnsop-resolver-update}}.
 As a consequence, they are not susceptible to many of the cache poisoning attacks enumerated in {{DNS-CACHE-INJECTIONS}} that are based upon the relative trustworthiness of DNS data.
