@@ -233,7 +233,7 @@ This NS RRset however has a lower trustworthiness than the set from the direct q
 
 When a resolver detects that the child's apex NS RRset contains different nameservers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD (See {{IANA}}).
 
-A No Data {{Section 2.2 of RFC2308}} response for the validating NS query should be treated the same as a failed validating NS query.
+A No Data response (see {{Section 2.2 of RFC2308}}) for the validating NS query should be treated the same as a failed validating NS query.
 The parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
 
 Additional validation queries for the "glue" address RRs of referral responses (if not already authoritatively present in cache) SHOULD be sent with the validation query for the NS RRset as well.
