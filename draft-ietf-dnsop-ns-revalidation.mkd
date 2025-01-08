@@ -53,6 +53,7 @@ normative:
     RFC1034:
     RFC1035:
     RFC2181:
+    RFC2308:
     RFC8109:
     RFC8806:
     RFC8914:
@@ -232,6 +233,9 @@ This NS RRset however has a lower trustworthiness than the set from the direct q
 
 When a resolver detects that the child's apex NS RRset contains different nameservers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD (See {{IANA}}).
 
+A No Data {{Section 2.2 of RFC2308}} response for the validating NS query should be treated the same as a failed validating NS query.
+The parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
+
 Additional validation queries for the "glue" address RRs of referral responses (if not already authoritatively present in cache) SHOULD be sent with the validation query for the NS RRset as well.
 Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
 Successive queries directed to the same zone will be directed to the authoritative nameservers denoted in the referral response.
@@ -241,6 +245,10 @@ Outstanding validation queries for "glue" address RRs that do not match names in
 Their result will no longer be used in queries for the zone.
 Outstanding validation queries for "glue" address RRs that do match names in the authoritative NS RRset MUST be left running to completion.
 They do not need to be re-queried after reception of the authoritative NS RRset (see [](#upgrade-addresses)).
+
+Validated "glue" may result in unreachable destinations.
+A resolver MAY choose to keep the non-authoritative value for the "glue" next to the preferred authoritative value for fallback purposes.
+Such a resolver MAY choose to fallback to use the non-authoritative value as a last resort, but SHOULD do so only if all other authoritative "glue" led to unreachable destinations as well.
 
 Resolvers may choose to delay the response to the triggering query until both the triggering query and the validation queries have been answered.
 In practice, we expect many implementations may answer the triggering query in advance of the validation query for performance reasons.
