@@ -181,8 +181,31 @@ The second recommendation is to revalidate the delegation by re-querying the par
 
 Terminology
 -----------
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 {{?RFC2119}} {{?RFC8174}} when, and only when, they appear in all capitals, as shown here.
+{::boilerplate bcp14-tagged}
 
+Throughout this document we will also use terminology with the meaning as defined below:
+
+{: vspace="0"}
+Triggering query:
+: the DNS query that caused ("triggered") a referral response.
+
+Infrastructure RRsets (data):
+: the NS and address (A and AAAA) RRsets used by resolvers to contact the authoritative name servers
+
+Revalidation:
+: the process of obtaining the authoritative infrastructure data
+
+Validation (validating) query:
+: the extra query that is performed to get the authoritative version of infrastructure RRsets
+
+Delegation revalidation:
+: re-establishing the existence and validity of the parent-side NS RRset of a delegation
+
+Re-validation point:
+: a delegation under re-validation
+
+Re-delegation:
+: the process of changing a delegation information to another set of authoritative name servers, potentionally under different administrative control
 
 Motivation                      {#motivation}
 ==========
@@ -220,7 +243,7 @@ Upgrading NS RRset Credibility  {#upgrade-ns}
 ==============================
 
 When a referral response is received during iteration, a validation query SHOULD be sent in parallel with the resolution of the triggering query, to one of the delegated nameservers for the newly discovered zone cut.
-Note that validating resolvers today, when following a secure referral, already need to dispatch a query to one of the delegated nameservers for the DNSKEY RRset, so this validation query could be sent in parallel with that DNSKEY query.
+Note that DNSSEC validating resolvers today, when following a secure referral, already need to dispatch a query to one of the delegated nameservers for the DNSKEY RRset, so this validation query could be sent in parallel with that DNSKEY query.
 
 A validation query consists of a query for the child's apex NS RRset, sent to one of the newly discovered delegation's nameservers.
 Normal iterative logic applies to the processing of responses to validation queries, including storing the results in cache, trying the next server on SERVFAIL or timeout, and so on.
