@@ -58,6 +58,7 @@ normative:
     RFC8806:
     RFC8914:
     RFC8976:
+    RFC9520:
     RFC9567:
 
 informative:
@@ -235,6 +236,7 @@ When a resolver detects that the child's apex NS RRset contains different namese
 
 A No Data response (see {{Section 2.2 of RFC2308}}) for the validating NS query should be treated the same as a failed validating NS query.
 The parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
+All resolution failures MUST be cached as directed in {{RFC9520}}, to prevent aggressive requeries.
 
 Additional validation queries for the "glue" address RRs of referral responses (if not already authoritatively present in cache) SHOULD be sent with the validation query for the NS RRset as well.
 Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
