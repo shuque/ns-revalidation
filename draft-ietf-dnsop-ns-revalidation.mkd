@@ -165,7 +165,7 @@ informative:
 This document recommends improved DNS resolver behavior with respect to the processing of Name Server (NS) resource record (RR) sets (RRsets) during iterative resolution.
 When following a referral response from an authoritative server to a child zone, DNS resolvers should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
 The (A and AAAA) address RRsets in the additional section from referral responses and authoritative NS answers for the names of the NS RRset, should similarly be re-queried and used to replace the entries with the lower trustworthiness ranking in cache.
-Resolvers should also periodically revalidate the child delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
+Resolvers should also periodically revalidate the delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
 
 --- middle
 
@@ -174,7 +174,7 @@ Introduction                    {#into}
 
 This document recommends improved DNS {{RFC1034}} {{RFC1035}} resolver behavior with respect to the processing of NS record sets during iterative resolution.
 The first recommendation is that resolvers, when following a referral response from an authoritative server to a child zone, should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
-The address records in the additional section from the referral response (as glue) or authoritative NS response that match the names of the NS RRset should similarly be required if they are cached non-authoritatively.
+The address records in the additional section from the referral response (as glue) or authoritative NS response that match the names of the NS RRset should similarly be re-queried if they are cached non-authoritatively.
 The authoritative answers from those queries should replace the cached non-authoritative A and AAAA RRsets.
 
 The second recommendation is to revalidate the delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
@@ -195,7 +195,7 @@ Another goal is to improve DNS security.
 The delegation NS RRset at the bottom of the parent zone and the apex NS RRset in the child zone are unsynchronized in the DNS protocol.
 {{Section 4.2.2 of RFC1034}} says "The administrators of both zones should insure that the NS and glue RRs which mark both sides of the cut are consistent and remain so.".
 But for a variety of reasons they could not be {{SOMMESE}}.
-Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative glue ({{Sections 5.4.1 (Ranking data) and 6.1 (Zone authority) of RFC2181}}).
+Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative ({{Sections 5.4.1 (Ranking data) and 6.1 (Zone authority) of RFC2181}}).
 Hence the NS RRset "below the zone cut" should immediately replace the parent's delegating NS RRset in cache when an iterative caching DNS resolver crosses a zone boundary.
 However, this can only happen if (1) the resolver receives the authoritative NS RRset in the Authority section of a response from the child zone, which is not mandatory, or (2) if the resolver explicitly issues an NS RRset query to the child zone as part of its iterative resolution algorithm.
 In the absence of this, it is possible for an iterative caching resolver to never learn the authoritative NS RRset for a zone, unless a downstream client of the resolver explicitly issues such an NS query, which is not something that normal enduser applications do, and thus cannot be relied upon to occur with any regularity.
@@ -211,7 +211,7 @@ This inhibits a child zone owner's ability to make more rapid changes to their n
 Similarly, a child zone owner may also choose to have longer TTLs in their delegation NS sets and address records to decrease the attack window for cache poisoning attacks.
 For example, at the time of writing, root-servers.net has a TTL of 6 weeks for the root server identifier address records, where the TTL in the priming response is 6 days.
 
-A child zone's delegation still needs to be periodically revalidated at the parent to make sure that the parent zone has not legitimately re-delegated the zone to a different set of nameservers, or even removed the delegation.
+A zone's delegation still needs to be periodically revalidated at the parent to make sure that the parent zone has not legitimately re-delegated the zone to a different set of nameservers, or even removed the delegation.
 Otherwise, resolvers that refresh the TTL of a child NS RRset on subsequent queries or due to pre-fetching, may cling to those nameservers long after they have been re-delegated elsewhere.
 This leads to the second recommendation in this document, "Delegation Revalidation" - Resolvers should record the TTL of the parent's delegating NS RRset, and use it to trigger a revalidation action.
 Attacks exploiting lack of this revalidation have been described in {{GHOST1}}, {{GHOST2}}.
@@ -219,16 +219,16 @@ Attacks exploiting lack of this revalidation have been described in {{GHOST1}}, 
 Upgrading NS RRset Credibility  {#upgrade-ns}
 ==============================
 
-When a referral response is received during iteration, a validation query SHOULD be sent in parallel with the resolution of the triggering query, to the delegated nameservers for the newly discovered zone cut.
-Note that validating resolvers today, when following a secure referral, already need to dispatch a query to the delegated nameservers for the DNSKEY RRset, so this validation query could be sent in parallel with that DNSKEY query.
+When a referral response is received during iteration, a validation query SHOULD be sent in parallel with the resolution of the triggering query, to one of the delegated nameservers for the newly discovered zone cut.
+Note that validating resolvers today, when following a secure referral, already need to dispatch a query to one of the delegated nameservers for the DNSKEY RRset, so this validation query could be sent in parallel with that DNSKEY query.
 
-A validation query consists of a query for the child's apex NS RRset, sent to the newly discovered delegation's nameservers.
+A validation query consists of a query for the child's apex NS RRset, sent to one of the newly discovered delegation's nameservers.
 Normal iterative logic applies to the processing of responses to validation queries, including storing the results in cache, trying the next server on SERVFAIL or timeout, and so on.
 Positive responses to this validation query will be cached with an authoritative data ranking.
 Successive queries directed to the same zone will be directed to the nameservers listed in the child's apex, due to the ranking of this answer.
 If the validation query fails, the parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
 
-The triggering query to the child may contain the NS RRset in the authority section as well.
+A response to the triggering query to the child may contain the NS RRset in the authority section as well.
 This NS RRset however has a lower trustworthiness than the set from the direct query ({{Section 5.4.1 of RFC2181}}), so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query will be stored in the cache eventually.
 
 When a resolver detects that the child's apex NS RRset contains different nameservers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD (See {{IANA}}).
@@ -240,8 +240,8 @@ Additional validation queries for the "glue" address RRs of referral responses (
 Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
 Successive queries directed to the same zone will be directed to the authoritative nameservers denoted in the referral response.
 
-The names from the NS RRset from a validating NS query may differ from the names in NS RRset in the referral response.
-Outstanding validation queries for "glue" address RRs that do not match names in the authoritative NS RRset may be discarded, or they may be left running to completion.
+The names from the NS RRset in a validating NS response may differ from the names from the NS RRset in the referral response.
+Outstanding validation queries for "glue" address RRs that do not match names in a newly discovered authoritative NS RRset may be discarded, or they may be left running to completion.
 Their result will no longer be used in queries for the zone.
 Outstanding validation queries for "glue" address RRs that do match names in the authoritative NS RRset MUST be left running to completion.
 They do not need to be re-queried after reception of the authoritative NS RRset (see [](#upgrade-addresses)).
@@ -255,11 +255,11 @@ In practice, we expect many implementations may answer the triggering query in a
 An additional reason is that there are unfortunately a number of nameservers in the field that (incorrectly) fail to properly answer explicit queries for zone apex NS records, and thus the revalidation logic may need to be applied lazily and opportunistically to deal with them.
 In cases where the delegated nameservers respond incorrectly to an NS query, the resolver SHOULD abandon this algorithm for the zone in question and fall back to using only the information from the parent's referral response.
 
-If the resolver chooses to delay the response, and there are no nameserver names in common between the child's apex NS RRset and the parent's delegation NS RRset, then the responses received from forwarding the triggering query to the parent's delegated nameservers SHOULD be discarded after validation, and this query should be forwarded again to the child's apex nameservers.
+If the resolver chooses to delay the response, and there are no nameserver names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated nameservers SHOULD be discarded, and this query should be sent again to one of the child's apex nameservers.
 
 Upgrading A and AAAA RRset Credibility  {#upgrade-addresses}
 ======================================
-Authoritative responses for a zone's NS RRset at the apex can contain additional addresses.
+Authoritative responses for a zone's NS RRset at the apex can contain nameserver addresses in the Additional section.
 An NS RRset validation response is an example of such a response.
 A priming response is another example of an authoritative zone's NS RRset response {{RFC8109}}.
 
@@ -361,7 +361,7 @@ Acknowledgements                {#Acknowledgements}
 
 Wouter Wijngaards proposed explicitly obtaining authoritative child NS data in {{I-D.wijngaards-dnsext-resolver-side-mitigation}}.
 This behavior has been implemented in the Unbound DNS resolver via the "harden-referral-path" option.
-The combination of child NS fetch and revalidating the child delegation was originally proposed in {{I-D.vixie-dnsext-resimprove}}, by Paul Vixie, Rodney Joffe, and Frederico Neves.
+The combination of child NS fetch and revalidating the delegation was originally proposed in {{I-D.vixie-dnsext-resimprove}}, by Paul Vixie, Rodney Joffe, and Frederico Neves.
 
 The authors would like to thank Ralph Dolmans who was an early collaborator on this work, as well as the many members of the IETF DNS Operations Working Group for helpful comments and discussion.
 
