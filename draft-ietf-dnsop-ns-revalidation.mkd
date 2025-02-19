@@ -273,8 +273,8 @@ Otherwise, the addresses cannot be assumed to be complete or even authoritativel
 Note that there may be outstanding address validation queries for the names of the authoritative NS RRset (from referral address validation queries).
 In those cases no new validation queries need to be made.
 
-Strict and lazy revalidation {#strict}
-============================
+Strict and opportunistic revalidation {#strict}
+=====================================
 
 Strictly revalidating referrals and authoritative NS RRset responses
 ------------------------------=-------------------------------------
@@ -284,8 +284,8 @@ This would offer the most trustworthy responses with the least risk for forgery 
 
 If the resolver chooses to delay the response, and there are no nameserver names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated nameservers SHOULD be discarded, and this query should be sent again to one of the child's apex nameservers.
 
-Lazily revalidating referral and authoritative NS RRset responses {#lazy}
------------------------------------------------------------------
+Opportunistic revalidating referral and authoritative NS RRset responses {#opportunistic}
+------------------------------------------------------------------------
 
 In practice, we expect many implementations may answer the triggering query in advance of the validation query for performance reasons.
 An additional reason is that there are unfortunately a number of nameservers in the field that (incorrectly) fail to properly answer explicit queries for zone apex NS records, and thus the revalidation logic may need to be applied lazily and opportunistically to deal with them.
