@@ -241,7 +241,7 @@ All resolution failures MUST be cached as directed in {{RFC9520}}, to prevent ag
 Upgrading A and AAAA RRset Credibility  {#upgrade-addresses}
 ======================================
 
-Upgrading glue
+Upgrading glue {#glue}
 --------------
 
 Additional validation queries for the "glue" address RRs of referral responses (if not already authoritatively present in cache) SHOULD be sent with the validation query for the NS RRset as well.
@@ -270,7 +270,7 @@ Only when such additional addresses are DNSSEC verifiable, (because the complete
 DNSSEC validation is enough validation in those cases.
 Otherwise, the addresses cannot be assumed to be complete or even authoritatively present in the same zone, and additional validation queries SHOULD be made for these addresses.
 
-Note that there may be outstanding address validation queries for the names of the authoritative NS RRset (from referral address validation queries).
+Note that there may be outstanding address validation queries for the names of the authoritative NS RRset from the revalidation queries for the "glue" in an possibly earlier referral response for the zone (see {{glue}}).
 In those cases no new validation queries need to be made.
 
 Strict and lazy revalidation {#strict}
