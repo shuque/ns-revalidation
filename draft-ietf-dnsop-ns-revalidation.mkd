@@ -255,7 +255,7 @@ Such a resolver MAY choose to fallback to use the non-authoritative value as a l
 Resolvers may choose to delay the response to the triggering query until both the triggering query and the validation queries have been answered.
 In practice, we expect many implementations may answer the triggering query in advance of the validation query for performance reasons.
 An additional reason is that there are unfortunately a number of nameservers in the field that (incorrectly) fail to properly answer explicit queries for zone apex NS records, and thus the revalidation logic may need to be applied lazily and opportunistically to deal with them.
-In cases where the delegated nameservers responds incorrectly to an NS query (any response other than a NOERROR responses that contains an NS RRset in the answer section), the resolver SHOULD abandon this algorithm for the zone in question and fall back to using only the information from the parent's referral response.
+In cases where all the delegated nameservers respond incorrectly to an NS query (i.e. none of the nameservers responded with a NOERROR response that contained an NS RRset in the answer section), the resolver SHOULD abandon this algorithm for the zone in question and fall back to using only the information from the parent's referral response.
 
 If the resolver chooses to delay the response, and there are no nameserver names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated nameservers SHOULD be discarded, and this query should be sent again to one of the child's apex nameservers.
 
