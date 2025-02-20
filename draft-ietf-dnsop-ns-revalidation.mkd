@@ -378,8 +378,7 @@ Such resolvers will however never benefit from DNSSEC protection of infrastructu
 
 Revalidating referral and authoritative NS RRset responses will induce more traffic from the resolver to the authoritative name servers.
 The traffic increase may be substantial if the address RRsets for the names in the NS RRset's RDATA were provided non-authoritatively (as glue or as additional addresses) and need revalidation too {{REDIRECTED-QUERY-TRAFFIC}.
-Resolvers MUST take care to limit the ammount of work they are willing to do to resolve a query to a sensible amount.
-One way to reduce work is to revalidate only a limited set of addresses RRs (see {{upgrade-addresses}}), or restrict the names to use to the ones for which there were already addresses authoritatively in cache, and only start revalidating the remaining addresses when the validated ones proved unsuccessful.
+Resolvers SHOULD take care to limit the amount of work they are willing to do to resolve a query to a sensible amount.
 
 --- back
 
