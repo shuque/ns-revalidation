@@ -266,8 +266,7 @@ Authoritative responses for a zone's NS RRset at the apex can contain nameserver
 An NS RRset validation response is an example of such a response.
 A priming response is another example of an authoritative zone's NS RRset response {{RFC8109}}.
 
-Additional addresses in authoritative NS RRset responses SHOULD be validated if they are not already authoritatively in cache.
-Only when such additional addresses are DNSSEC verifiable, (because the complete RRset is included, including a verifiable signature for the RRset), such additional addresses can be cached authoritatively immediately without additional validation queries.
+When additional addresses in authoritative NS RRset responses are DNSSEC verifiable (because the complete RRset is included, including a verifiable signature for the RRset) and DNSSEC secure, they MAY be cached authoritatively immediately without additional validation queries.
 DNSSEC validation is enough validation in those cases.
 Otherwise, the addresses cannot be assumed to be complete or even authoritatively present in the same zone, and additional validation queries SHOULD be made for these addresses.
 
