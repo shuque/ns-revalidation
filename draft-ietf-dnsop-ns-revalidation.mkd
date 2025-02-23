@@ -245,7 +245,8 @@ Upgrading glue
 --------------
 
 Additional validation queries for the "glue" address RRs of referral responses (if not already authoritatively present in cache) SHOULD be sent with the validation query for the NS RRset as well.
-Positive responses will be cached authoritatively and replace the non authoritative "glue" entries.
+Positive responses will be cached with authoritative data ranking.
+The non-authoritative "glue" MAY be cached with non-authoritative data ranking for fallback purposes.
 Successive queries directed to the same zone will be directed to the authoritative nameservers denoted in the referral response.
 
 The names from the NS RRset in a validating NS response may differ from the names from the NS RRset in the referral response.
