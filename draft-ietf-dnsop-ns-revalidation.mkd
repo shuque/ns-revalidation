@@ -202,8 +202,31 @@ The second recommendation is to revalidate the delegation by re-querying the par
 
 Terminology
 -----------
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 {{?RFC2119}} {{?RFC8174}} when, and only when, they appear in all capitals, as shown here.
+{::boilerplate bcp14-tagged}
 
+Throughout this document we will also use terminology with the meaning as defined below:
+
+{: vspace="0"}
+Triggering query:
+: the DNS query that caused ("triggered") a referral response.
+
+Infrastructure RRsets (data):
+: the NS and address (A and AAAA) RRsets used by resolvers to contact the authoritative name servers
+
+Revalidation:
+: the process of obtaining the authoritative infrastructure data
+
+Validation (validating) query:
+: the extra query that is performed to get the authoritative version of infrastructure RRsets
+
+Delegation revalidation:
+: re-establishing the existence and validity of the parent-side NS RRset of a delegation
+
+Revalidation point:
+: a delegation under revalidation
+
+Re-delegation:
+: the process of changing a delegation information to another set of authoritative name servers, potentially under different administrative control
 
 Motivation                      {#motivation}
 ==========
@@ -219,7 +242,7 @@ But for a variety of reasons they could not be {{SOMMESE}}.
 Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative ({{Sections 5.4.1 (Ranking data) and 6.1 (Zone authority) of RFC2181}}).
 Hence the NS RRset "below the zone cut" should immediately replace the parent's delegating NS RRset in cache when an iterative caching DNS resolver crosses a zone boundary.
 However, this can only happen if (1) the resolver receives the authoritative NS RRset in the Authority section of a response from the child zone, which is not mandatory, or (2) if the resolver explicitly issues an NS RRset query to the child zone as part of its iterative resolution algorithm.
-In the absence of this, it is possible for an iterative caching resolver to never learn the authoritative NS RRset for a zone, unless a downstream client of the resolver explicitly issues such an NS query, which is not something that normal enduser applications do, and thus cannot be relied upon to occur with any regularity.
+In the absence of this, it is possible for an iterative caching resolver to never learn the authoritative NS RRset for a zone, unless a downstream client of the resolver explicitly issues such an NS query, which is not something that normal end user applications do, and thus cannot be relied upon to occur with any regularity.
 
 Increasingly, there is a trend towards minimizing unnecessary data in DNS responses.
 Several popular DNS implementations default to such a configuration (see "minimal-responses" in BIND and NSD).
@@ -227,32 +250,32 @@ So, they may never include the authoritative NS RRset in the Authority section o
 
 A common reason that zone owners want to ensure that resolvers place the authoritative NS RRset preferentially in their cache is that the TTLs may differ between the parent and child side of the zone cut.
 Some DNS Top Level Domains (TLDs) only support long fixed TTLs in their delegation NS sets.
-This inhibits a child zone owner's ability to make more rapid changes to their nameserver configuration using a shorter TTL, if resolvers have no systematic mechanism to observe and cache the child NS RRset.
+This inhibits a child zone owner's ability to make more rapid changes to their name server configuration using a shorter TTL, if resolvers have no systematic mechanism to observe and cache the child NS RRset.
 
 Similarly, a child zone owner may also choose to have longer TTLs in their delegation NS sets and address records to decrease the attack window for cache poisoning attacks.
 For example, at the time of writing, root-servers.net has a TTL of 6 weeks for the root server identifier address records, where the TTL in the priming response is 6 days.
 
-A zone's delegation still needs to be periodically revalidated at the parent to make sure that the parent zone has not legitimately re-delegated the zone to a different set of nameservers, or even removed the delegation.
-Otherwise, resolvers that refresh the TTL of a child NS RRset on subsequent queries or due to pre-fetching, may cling to those nameservers long after they have been re-delegated elsewhere.
+A zone's delegation still needs to be periodically revalidated at the parent to make sure that the parent zone has not legitimately re-delegated the zone to a different set of name servers, or even removed the delegation.
+Otherwise, resolvers that refresh the TTL of a child NS RRset on subsequent queries or due to pre-fetching, may cling to those name servers long after they have been re-delegated elsewhere.
 This leads to the second recommendation in this document, "Delegation Revalidation" - Resolvers should record the TTL of the parent's delegating NS RRset, and use it to trigger a revalidation action.
 Attacks exploiting lack of this revalidation have been described in {{GHOST1}}, {{GHOST2}}.
 
 Upgrading NS RRset Credibility  {#upgrade-ns}
 ==============================
 
-When a referral response is received during iteration, a validation query SHOULD be sent in parallel with the resolution of the triggering query, to one of the delegated nameservers for the newly discovered zone cut.
-Note that validating resolvers today, when following a secure referral, already need to dispatch a query to one of the delegated nameservers for the DNSKEY RRset, so this validation query could be sent in parallel with that DNSKEY query.
+When a referral response is received during iteration, a validation query SHOULD be sent in parallel with the resolution of the triggering query, to one of the delegated name servers for the newly discovered zone cut.
+Note that DNSSEC validating resolvers today, when following a secure referral, already need to dispatch a query to one of the delegated name servers for the DNSKEY RRset, so this validation query could be sent in parallel with that DNSKEY query.
 
-A validation query consists of a query for the child's apex NS RRset, sent to one of the newly discovered delegation's nameservers.
+A validation query consists of a query for the child's apex NS RRset, sent to one of the newly discovered delegation's name servers.
 Normal iterative logic applies to the processing of responses to validation queries, including storing the results in cache, trying the next server on SERVFAIL or timeout, and so on.
 Positive responses to this validation query will be cached with an authoritative data ranking.
-Successive queries directed to the same zone will be directed to the nameservers listed in the child's apex, due to the ranking of this answer.
+Successive queries directed to the same zone will be directed to the name servers listed in the child's apex, due to the ranking of this answer.
 If the validation query fails, the parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
 
 A response to the triggering query to the child may contain the NS RRset in the authority section as well.
 This NS RRset however has a lower trustworthiness than the set from the direct query ({{Section 5.4.1 of RFC2181}}), so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query will be stored in the cache eventually.
 
-When a resolver detects that the child's apex NS RRset contains different nameservers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD (See {{IANA}}).
+When a resolver detects that the child's apex NS RRset contains different name servers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD (See {{IANA}}).
 
 A No Data response (see {{Section 2.2 of RFC2308}}) for the validating NS query should be treated the same as a failed validating NS query.
 The parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
@@ -314,28 +337,28 @@ In cases where the delegated nameservers respond incorrectly to an NS query, the
 Delegation Revalidation         {#revalidation}
 =======================
 
-The essence of this mechanism is re-validation of all delegation metadata that directly or indirectly supports an owner name in cache.
+The essence of this mechanism is revalidation of all delegation metadata that directly or indirectly supports an owner name in cache.
 This requires a cache to remember the delegated name server names for each zone cut as received from the parent (delegating) zone's name servers, and also the TTL of that NS RRset, and the TTL of the associated DS RRset (if seen).
 
-A delegation under re-validation is called a "re-validation point" and is "still valid" if its parent zone's servers still respond to an in-zone question with a referral to the re-validation point, and if that referral overlaps with the previously cached referral by at least one name server name, and the DS RRset (if seen) overlaps the previously cached DS RRset (if also seen) by at least one delegated signer.
+A delegation under revalidation is called a "revalidation point" and is "still valid" if its parent zone's servers still respond to an in-zone question with a referral to the revalidation point, and if that referral overlaps with the previously cached referral by at least one name server name, and the DS RRset (if seen) overlaps the previously cached DS RRset (if also seen) by at least one delegated signer.
 
 If the response is not a referral or refers to a different zone than before, then the shape of the delegation hierarchy has changed.
-If the response is a referral to the re-validation point but to a wholly novel NS RRset or a wholly novel DS RRset, then the authority for that zone has changed.
+If the response is a referral to the revalidation point but to a wholly novel NS RRset or a wholly novel DS RRset, then the authority for that zone has changed.
 For clarity, this includes transitions between empty and non-empty DS RRsets.
 
-If the shape of the delegation hierarchy or the authority for a zone has been found to change, then currently cached data whose owner names are at or below that re-validation point MUST NOT be used.
+If the shape of the delegation hierarchy or the authority for a zone has been found to change, then currently cached data whose owner names are at or below that revalidation point MUST NOT be used.
 Such non-use can be by directed garbage collection or lazy generational garbage collection or some other method befitting the architecture of the cache.
 What matters is that the cache behave as though this data was removed.
 
-Since re-validation can discover changes in the shape of the delegation hierarchy it is more efficient to re-validate from the top (root) downward (to the owner name) since an upper level re-validation may obviate lower level re-validations.
+Since revalidation can discover changes in the shape of the delegation hierarchy it is more efficient to revalidate from the top (root) downward (to the owner name) since an upper level revalidation may obviate lower level revalidations.
 What matters is that the supporting chain of delegations from the root to the owner name be demonstrably valid; further specifics are implementation details.
 
-Re-validation MUST be triggered when delegation meta-data has been cached for a period at most exceeding the delegating NS or DS (if seen) RRset TTL.
+Revalidation MUST be triggered when delegation meta-data has been cached for a period at most exceeding the delegating NS or DS (if seen) RRset TTL.
 If the corresponding child zone's apex NS RRset TTL is smaller than the delegating NS RRset TTL, revalidation MUST happen at that interval instead.
 However, resolvers SHOULD impose a sensible minimum TTL floor they are willing to endure to avoid potential computational DoS attacks inflicted by zones with very short TTLs.
 
-In normal operations this meta-data can be quickly re-validated with no further work.
-However, when re-delegation or take-down occurs, a re-validating cache will discover this within one delegation TTL period, allowing the rapid expulsion of old data from the cache.
+In normal operations this meta-data can be quickly revalidated with no further work.
+However, when re-delegation or take-down occurs, a revalidating cache will discover this within one delegation TTL period, allowing the rapid expulsion of old data from the cache.
 
 IANA Considerations             {#IANA}
 ===================
@@ -378,7 +401,7 @@ The paper provides recommendations for handling records in DNS responses with re
 
 [Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
 However, it is important to implement the steps described in [Delegation Revalidation](#revalidation) at the expiration of the parent's delegating TTL.
-Otherwise, the operator of a malicious child zone, originally delegated to, but subsequently delegated away from, can cause resolvers that refresh TTLs on subsequent NS set queries, or that pre-fetch NS queries, to never learn of the redelegated zone {{GHOST1}}, {{GHOST2}}.
+Otherwise, the operator of a malicious child zone, originally delegated to, but subsequently delegated away from, can cause resolvers that refresh TTLs on subsequent NS set queries, or that pre-fetch NS queries, to never learn of the re-delegated zone {{GHOST1}}, {{GHOST2}}.
 
 Other considerations
 --------------------
