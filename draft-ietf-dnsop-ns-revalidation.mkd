@@ -268,17 +268,17 @@ Note that DNSSEC validating resolvers today, when following a secure referral, a
 
 A validation query consists of a query for the child's apex NS RRset, sent to one of the newly discovered delegation's name servers.
 Normal iterative logic applies to the processing of responses to validation queries, including storing the results in cache, trying the next server on SERVFAIL or timeout, and so on.
-Positive responses to this validation query will be cached with an authoritative data ranking.
-Successive queries directed to the same zone will be directed to the name servers listed in the child's apex, due to the ranking of this answer.
-If the validation query fails, the parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
+Positive responses to this validation query MAY be cached with an authoritative data ranking.
+Successive queries directed to the same zone SHOULD be directed to the nameservers listed in the child's apex, due to the ranking of this answer.
+If the validation query fails, the parent NS RRset SHOULD remain the one with the highest ranking and SHOULD be used for successive queries.
 
 A response to the triggering query to the child may contain the NS RRset in the authority section as well.
-This NS RRset however has a lower trustworthiness than the set from the direct query ({{Section 5.4.1 of RFC2181}}), so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query will be stored in the cache eventually.
+This NS RRset however has a lower trustworthiness than the set from the direct query ({{Section 5.4.1 of RFC2181}}), so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query MAY be stored in the cache eventually.
 
 When a resolver detects that the child's apex NS RRset contains different name servers than the non-authoritative version at the parent side of the zone cut, it MAY report the mismatch using DNS Error Reporting {{RFC9567}} on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD (See {{IANA}}).
 
 A No Data response (see {{Section 2.2 of RFC2308}}) for the validating NS query should be treated the same as a failed validating NS query.
-The parent NS RRset will remain the one with the highest ranking and will be used for successive queries.
+The parent NS RRset SHOULD remain the one with the highest ranking and SHOULD be used for successive queries.
 All resolution failures MUST be cached as directed in {{RFC9520}}, to prevent aggressive requeries.
 
 Upgrading A and AAAA RRset Credibility  {#upgrade-addresses}
@@ -288,13 +288,13 @@ Upgrading glue
 --------------
 
 Additional validation queries for the "glue" address RRs of referral responses (if not already authoritatively present in cache) SHOULD be sent with the validation query for the NS RRset as well.
-Positive responses will be cached with authoritative data ranking.
+Positive responses SHOULD be cached with authoritative data ranking.
 The non-authoritative "glue" MAY be cached with non-authoritative data ranking for fallback purposes.
-Successive queries directed to the same zone will be directed to the authoritative nameservers denoted in the referral response.
+Successive queries directed to the same zone SHOULD be directed to the authoritative nameservers denoted in the referral response.
 
 The names from the NS RRset in a validating NS response may differ from the names from the NS RRset in the referral response.
 Outstanding validation queries for "glue" address RRs that do not match names in a newly discovered authoritative NS RRset may be discarded, or they may be left running to completion.
-Their result will no longer be used in queries for the zone.
+Their result MUST no longer be used in queries for the zone.
 Outstanding validation queries for "glue" address RRs that do match names in the authoritative NS RRset MUST be left running to completion.
 They do not need to be re-queried after reception of the authoritative NS RRset (see [](#upgrade-addresses)).
 
@@ -358,7 +358,7 @@ If the corresponding child zone's apex NS RRset TTL is smaller than the delegati
 However, resolvers SHOULD impose a sensible minimum TTL floor they are willing to endure to avoid potential computational DoS attacks inflicted by zones with very short TTLs.
 
 In normal operations this meta-data can be quickly revalidated with no further work.
-However, when re-delegation or take-down occurs, a revalidating cache will discover this within one delegation TTL period, allowing the rapid expulsion of old data from the cache.
+However, when re-delegation or take-down occurs, a revalidating cache SHOULD discover this within one delegation TTL period, allowing the rapid expulsion of old data from the cache.
 
 IANA Considerations             {#IANA}
 ===================
