@@ -2,7 +2,7 @@
 title: Delegation Revalidation by DNS Resolvers
 abbrev: DNS Delegation Revalidation
 docname: draft-ietf-dnsop-ns-revalidation-09
-date: 2025-02-27
+date: 2025-06-04
 
 ipr: trust200902
 submissiontype: IETF
@@ -183,7 +183,7 @@ informative:
 
 --- abstract
 
-This document recommends improved DNS resolver behavior with respect to the processing of Name Server (NS) resource record (RR) sets (RRsets) during iterative resolution.
+This document describes an optional algorithm for the processing of Name Server (NS) resource record (RR) sets (RRsets) during iterative resolution, and describes the benefits and considerations of this algorithm.
 When following a referral response from an authoritative server to a child zone, DNS resolvers should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
 The (A and AAAA) address RRsets in the additional section from referral responses and authoritative NS answers for the names of the NS RRset, should similarly be re-queried and used to replace the entries with the lower trustworthiness ranking in cache.
 Resolvers should also periodically revalidate the delegation by re-querying the parent zone at the expiration of the TTL of either the parent or child NS RRset, whichever comes first.
