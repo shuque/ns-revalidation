@@ -198,8 +198,8 @@ This document recommends improved DNS {{RFC1034}} {{RFC1035}} resolver behavior 
 In {{upgrade-ns (Upgrading NS RRset Credibility)}} we recommend that resolvers, when following a referral response from an authoritative server to a child zone, should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
 
 {{upgrade-ns (Upgrading NS RRset Credibility)}} works most reliable with good quality child NS RRsets, where the name servers referenced in the RDATA of the NS RRset do result in IP addresses which serve the child zone.
-We consider both the root and the zones delegated from the root to have good quality child NS RRset, but recognize that the quality may deteriorate in further delegations.
-Therefore we recommend in {{scoped-upgrading}} to limit upgrading NS RRset credibility to the root zone and zones delegated from the root zone.
+We consider both the root, as well as the zones delegated from the root, to have good quality child NS RRset, but recognize that, because of the less transparently administered further delegations (among others by parties that are perhaps less devoted to DNS administration), some of those further delegations may be sub-optimal or even unfit for upgrading NS RRset credibility.
+{{scoped-upgrading}} describes limiting the upgrading of NS RRset credibility to address this.
 
 The address records in the additional section from the referral response (as glue) or authoritative NS response that match the names of the NS RRset should similarly be re-queried if they are cached non-authoritatively.
 The authoritative answers from those queries should replace the cached non-authoritative A and AAAA RRsets.
@@ -295,10 +295,8 @@ All resolution failures MUST be cached as directed in {{RFC9520}}, to prevent ag
 Limiting upgrading NS Credibility       {#scoped-upgrading}
 =================================
 {{upgrade-ns (Upgrading NS RRset Credibility)}} works most reliable with good quality child NS RRsets, where the name servers referenced in the RDATA of the NS RRset do result in IP addresses which serve the child zone.
-An implementation may wish to consider limiting revalidation to delegations that cross administrative boundaries such as anywhere in ".ip6.arpa" and ".in-addr.arpa" as well as any so-called "public suffix" such as the root zone, top level zones such as ".com" or ".net", and effective top level zones such as ".ad.jp" or ".co.uk".
-
-We consider both the root and the zones delegated from the root to have good quality child NS RRset, but recognize that the quality may deteriorate in further delegations.
-Therefore limiting upgrading NS RRset credibility to the root zone and zones delegated from the root zone is RECOMMENDED.
+We consider both the root, as well as the zones delegated from the root, to have good quality child NS RRset, but recognize that, because of the less transparently administered further delegations (among others by parties that are perhaps less devoted to DNS administration), some of those further delegations may be sub-optimal or even unfit for upgrading NS RRset credibility.
+An implementation MAY limit revalidation to delegations that cross administrative boundaries such as anywhere in ".ip6.arpa" and ".in-addr.arpa" as well as any so-called "public suffix" such as the root zone, top level zones such as ".com" or ".net", and effective top level zones such as ".ad.jp" or ".co.uk".
 
 Upgrading A and AAAA RRset Credibility  {#upgrade-addresses}
 ======================================
@@ -346,7 +344,7 @@ This would offer the most trustworthy responses with the least risk for forgery 
 
 If the resolver chooses to delay the response, and there are no nameserver names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated nameservers SHOULD be discarded, and this query should be sent again to one of the child's apex nameservers.
 
-It is highly RECOMMENDED, to limit **strict** upgrading of NS, A and AAAA RRset credibility, to the root zone and zones delegated from the root zone only (see {{scoped-upgrading}}).
+It is RECOMMENDED, to limit **strict** upgrading of NS, A and AAAA RRset credibility, to the root zone and zones delegated from the root zone only (see {{scoped-upgrading}}).
 
 Opportunistic revalidating referral and authoritative NS RRset responses {#opportunistic}
 ------------------------------------------------------------------------
