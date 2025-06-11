@@ -190,15 +190,26 @@ Resolvers should also periodically revalidate the delegation by re-querying the 
 
 --- middle
 
-Introduction                    {#into}
+Introduction                    {#intro}
 ============
 
 This document recommends improved DNS {{RFC1034}} {{RFC1035}} resolver behavior with respect to the processing of NS record sets during iterative resolution.
-The first recommendation is that resolvers, when following a referral response from an authoritative server to a child zone, should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
+
+In {{upgrade-ns (Upgrading NS RRset Credibility)}} we recommend that resolvers, when following a referral response from an authoritative server to a child zone, should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
+
+{{upgrade-ns (Upgrading NS RRset Credibility)}} works most reliable with good quality child NS RRsets, where the name servers referenced in the RDATA of the NS RRset do result in IP addresses which serve the child zone.
+We consider both the root, as well as the zones delegated from the root, to have good quality child NS RRset, but recognize that, because of the less transparently administered further delegations (among others by parties that are perhaps less devoted to DNS administration), some of those further delegations may be sub-optimal or even unfit for upgrading NS RRset credibility.
+{{scoped-upgrading}} describes limiting the upgrading of NS RRset credibility to address this.
+
 The address records in the additional section from the referral response (as glue) or authoritative NS response that match the names of the NS RRset should similarly be re-queried if they are cached non-authoritatively.
 The authoritative answers from those queries should replace the cached non-authoritative A and AAAA RRsets.
+This is described in (see {{upgrade-addresses (Upgrading A and AAAA RRset Credibility)}}).
 
-The second recommendation is to revalidate the delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
+In {{strict (Strict and opportunistic revalidation)}}, we make a distinction between strict and opportunistic revalidation.
+Strict revalidation provides {{impact (DNSSEC protection of infrastructure data)}} with DNSSEC signed infrastructure data and validating resolvers, but for it to work correctly, good quality child NS RRsets are a requisite.
+Opportunistic revalidation allows for fallback to the non-authoritative data returned in the referral responses, but therefore does not provide the same degree of protection as strict revalidation does.
+
+Finally, in {{revalidation (Delegation Revalidation), we recommend that resolvers revalidate the delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
 
 Terminology
 -----------
@@ -281,6 +292,12 @@ A No Data response (see {{Section 2.2 of RFC2308}}) for the validating NS query 
 The parent NS RRset SHOULD remain the one with the highest ranking and SHOULD be used for successive queries.
 All resolution failures MUST be cached as directed in {{RFC9520}}, to prevent aggressive requeries.
 
+Limiting upgrading NS Credibility       {#scoped-upgrading}
+=================================
+{{upgrade-ns (Upgrading NS RRset Credibility)}} works most reliable with good quality child NS RRsets, where the name servers referenced in the RDATA of the NS RRset do result in IP addresses which serve the child zone.
+We consider both the root, as well as the zones delegated from the root, to have good quality child NS RRset, but recognize that, because of the less transparently administered further delegations (among others by parties that are perhaps less devoted to DNS administration), some of those further delegations may be sub-optimal or even unfit for upgrading NS RRset credibility.
+An implementation MAY limit revalidation to delegations that cross administrative boundaries such as anywhere in ".ip6.arpa" and ".in-addr.arpa" as well as any so-called "public suffix" such as the root zone, top level zones such as ".com" or ".net", and effective top level zones such as ".ad.jp" or ".co.uk".
+
 Upgrading A and AAAA RRset Credibility  {#upgrade-addresses}
 ======================================
 
@@ -296,7 +313,7 @@ The names from the NS RRset in a validating NS response may differ from the name
 Outstanding validation queries for "glue" address RRs that do not match names in a newly discovered authoritative NS RRset may be discarded, or they may be left running to completion.
 Their result MUST no longer be used in queries for the zone.
 Outstanding validation queries for "glue" address RRs that do match names in the authoritative NS RRset MUST be left running to completion.
-They do not need to be re-queried after reception of the authoritative NS RRset (see [](#upgrade-addresses)).
+They do not need to be re-queried after reception of the authoritative NS RRset (see {{upgrade-addresses}}).
 
 Validated "glue" may result in unreachable destinations.
 A resolver MAY choose to keep the non-authoritative value for the "glue" next to the preferred authoritative value for fallback purposes.
@@ -327,12 +344,16 @@ This would offer the most trustworthy responses with the least risk for forgery 
 
 If the resolver chooses to delay the response, and there are no nameserver names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated nameservers SHOULD be discarded, and this query should be sent again to one of the child's apex nameservers.
 
+It is RECOMMENDED, to limit **strict** upgrading of NS, A and AAAA RRset credibility, to the root zone and zones delegated from the root zone only (see {{scoped-upgrading}}).
+
 Opportunistic revalidating referral and authoritative NS RRset responses {#opportunistic}
 ------------------------------------------------------------------------
 
 In practice, we expect many implementations may answer the triggering query in advance of the validation query for performance reasons.
 An additional reason is that there are unfortunately a number of nameservers in the field that (incorrectly) fail to properly answer explicit queries for zone apex NS records, and thus the revalidation logic may need to be applied lazily and opportunistically to deal with them.
 In cases where the delegated nameservers respond incorrectly to an NS query, the resolver SHOULD abandon this algorithm for the zone in question and fall back to using only the information from the parent's referral response.
+
+One may consider to only limit *strict* upgrading of NS, A and AAAA RRset credibility to the root zone and zones delegated from the root zone, and perform *opportunistic* revalidations for further delegations (see {{scoped-upgrading}}).
 
 Delegation Revalidation         {#revalidation}
 =======================
@@ -399,14 +420,12 @@ Cache poisoning protection
 In {{DNS-CACHE-INJECTIONS}} an overview is given of 18 cache poisoning attacks from which 13 can be remedied with delegation revalidation.
 The paper provides recommendations for handling records in DNS responses with respect to an earlier version of the idea presented in this document {{I-D.wijngaards-dnsext-resolver-side-mitigation}}.
 
-[Upgrading NS RRset Credibility](#upgrade-ns) allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
-However, it is important to implement the steps described in [Delegation Revalidation](#revalidation) at the expiration of the parent's delegating TTL.
+{{upgrade-ns (Upgrading NS RRset Credibility)}} allows resolvers to cache and utilize the authoritative child apex NS RRset in preference to the non-authoritative parent NS RRset.
+However, it is important to implement the steps described in {{revalidation (Delegation Revalidation)}} at the expiration of the parent's delegating TTL.
 Otherwise, the operator of a malicious child zone, originally delegated to, but subsequently delegated away from, can cause resolvers that refresh TTLs on subsequent NS set queries, or that pre-fetch NS queries, to never learn of the re-delegated zone {{GHOST1}}, {{GHOST2}}.
 
 Other considerations
 --------------------
-An implementation may wish to consider limiting revalidation to delegations that cross administrative boundaries such as anywhere in ".ip6.arpa" and ".in-addr.arpa" as well as any so-called "public suffix" such as the root zone, top level zones such as ".com" or ".net", and effective top level zones such as ".ad.jp" or ".co.uk".
-
 Some resolvers do not adhere to {{Sections 5.4.1 and 6.1 of RFC2181}}, and only use the non-authoritative parent side NS RRsets and glue returned in referral responses for contacting authoritative name servers {{I-D.fujiwara-dnsop-resolver-update}}.
 As a consequence, they are not susceptible to many of the cache poisoning attacks enumerated in {{DNS-CACHE-INJECTIONS}} that are based upon the relative trustworthiness of DNS data.
 Such resolvers are also not susceptible to the GHOST domain attacks {{GHOST1}}, {{GHOST2}}.
