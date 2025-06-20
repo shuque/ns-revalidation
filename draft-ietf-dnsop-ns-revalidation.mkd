@@ -244,7 +244,10 @@ Motivation                      {#motivation}
 There is wide variability in the behavior of deployed DNS resolvers today with respect to how they process delegation records.
 Some of them prefer the parent NS set, some prefer the child, and for others, what they preferentially cache depends on the dynamic state of queries and responses they have processed {{SOMMESE}}.
 This document aims to bring more commonality and predictability by standardizing the behavior in a way that comports with the DNS protocol.
+
 Another goal is to improve DNS security.
+The mechanisms described in this document help against GHOST domain attacks and a variety of cache poisoning attacks with resolvers that adhere to {{Sections 5.4.1 (Ranking data) and 6.1 (Zone authority) of RFC2181}}.
+Strictly revalidating referral and authoritative NS RRset responses, enables the resolver to defend itself against query redirection attacks, see {{security (Security and Privacy considerations)}}.
 
 The delegation NS RRset at the bottom of the parent zone and the apex NS RRset in the child zone are unsynchronized in the DNS protocol.
 {{Section 4.2.2 of RFC1034}} says "The administrators of both zones should insure that the NS and glue RRs which mark both sides of the cut are consistent and remain so.".
@@ -391,7 +394,7 @@ IANA is requested to assign a value to the "Extended DNS Error Codes" registry {
 | TBD       | referral NS RRset mismatch | \[this document\] |
 |-----------|----------------------------|-------------------|
 
-Security and Privacy Considerations     {#Security}
+Security and Privacy Considerations     {#security}
 ===================================
 
 DNSSEC protection of infrastructure data        {#impact}
