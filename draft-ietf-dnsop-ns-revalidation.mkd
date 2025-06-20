@@ -458,5 +458,5 @@ Implementation status           {#implementation-status}
   "Redhat Enterprise Linux has been running Unbound with the `harden-referral-path:` option set to `yes` for years without problems", as mentioned by Paul Wouters during dnsop workgroup session at the IETF 119.
 * The Knot Resolver software revalidates the priming response as part of priming the root zone since version 1.5.1 (released December 12, 2017)
 
-* {{delegation-revalidation}} has been implemented in the Unbound resolver since version 1.4.17 (released May 24, 2012).
+* {{revalidation}} has been implemented in the Unbound resolver since version 1.4.17 (released May 24, 2012).
 
