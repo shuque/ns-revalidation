@@ -350,7 +350,7 @@ This would offer the most trustworthy responses with the least risk for forgery 
 
 If the resolver chooses to delay the response, and there are no nameserver names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated nameservers SHOULD be discarded, and this query should be sent again to one of the child's apex nameservers.
 
-It is RECOMMENDED, to limit **strict** upgrading of NS, A and AAAA RRset credibility, to the root zone and zones delegated from the root zone only (see {{scoped-upgrading}}).
+It is RECOMMENDED, to scope **strict** upgrading of NS, A and AAAA RRset credibility, to the root zone and zones delegated from the root zone only (see {{scoped-upgrading}}).
 
 Opportunistic revalidating referral and authoritative NS RRset responses {#opportunistic}
 ------------------------------------------------------------------------
