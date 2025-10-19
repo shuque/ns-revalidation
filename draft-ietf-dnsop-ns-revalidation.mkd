@@ -1,7 +1,7 @@
 ---
 title: Delegation Revalidation by DNS Resolvers
 abbrev: DNS Delegation Revalidation
-docname: draft-ietf-dnsop-ns-revalidation-10
+docname: draft-ietf-dnsop-ns-revalidation-11
 
 ipr: trust200902
 submissiontype: IETF
@@ -69,6 +69,7 @@ informative:
     I-D.fujiwara-dnsop-resolver-update:
     I-D.vixie-dnsext-resimprove:
     I-D.wijngaards-dnsext-resolver-side-mitigation:
+    I-D.ietf-deleg:
     GHOST1:
         target: https://www.ndss-symposium.org/ndss2012/
         title: "Ghost Domain Names: Revoked Yet Still Resolvable"
@@ -212,7 +213,7 @@ In {{strict (Strict and opportunistic revalidation)}}, we make a distinction bet
 Strict revalidation provides {{impact (DNSSEC protection of infrastructure data)}} with DNSSEC signed infrastructure data and validating resolvers, but for it to work correctly, good quality child NS RRsets are a pre-requisite.
 Opportunistic revalidation allows for fallback to the non-authoritative data returned in the referral responses, but therefore does not provide the same degree of protection as strict revalidation does.
 
-Finally, in {{revalidation (Delegation Revalidation), we recommend that resolvers revalidate the delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
+Finally, in {{revalidation (Delegation Revalidation)}}, we recommend that resolvers revalidate the delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
 
 Terminology
 -----------
@@ -247,9 +248,12 @@ Motivation                      {#motivation}
 
 There is wide variability in the behavior of deployed DNS resolvers today with respect to how they process delegation records.
 Some of them prefer the parent NS set, some prefer the child, and for others, what they preferentially cache depends on the dynamic state of queries and responses they have processed {{SOMMESE}}.
-This document aims to bring more commonality and predictability by standardizing the behavior in a way that comports with the DNS protocol.
 
-Another goal is to improve DNS security.
+While this variability is expected to continue in deployed implementations, this document specifies an algorithm that can be adopted by resolvers to achieve several benefits.
+
+It preferentially and predictably prefers the authoritative NS set at the apex of the child zone, which better comports with the the DNS protocol's data ranking rules. (Note that the proposed redesign of the DNS delegation mechanism in {{I-D.ietf-deleg}} is expected to fundamentally alter where authoritative delegation information will reside. This document deals with the DNS delegation mechanism as currently deployed.)
+
+It offers several security advantages.
 The mechanisms described in this document help against GHOST domain attacks and a variety of cache poisoning attacks with resolvers that adhere to {{Sections 5.4.1 (Ranking data) and 6.1 (Zone authority) of RFC2181}}.
 Strictly revalidating referral and authoritative NS RRset responses, enables the resolver to defend itself against query redirection attacks, see {{security (Security and Privacy considerations)}}.
 
