@@ -363,7 +363,7 @@ In practice, many implementations are expected to answer the triggering query in
 An additional reason is that there are unfortunately a number of nameservers in the field that (incorrectly) fail to properly answer explicit queries for zone apex NS records, and thus the revalidation logic may need to be applied lazily and opportunistically to deal with them.
 In cases where the delegated nameservers respond incorrectly to an NS query, the resolver SHOULD abandon this algorithm for the zone in question and fall back to using only the information from the parent's referral response.
 
-Operators MAY only limit *strict* upgrading of NS, A and AAAA RRset credibility to the root zone and zones delegated from the root zone, and perform *opportunistic* revalidations for further delegations (see {{scoped-upgrading}}).
+Operators MAY limit *strict* upgrading of NS, A and AAAA RRset credibility to the root zone and zones delegated from the root zone, and perform *opportunistic* revalidations for further delegations (see {{scoped-upgrading}}).
 
 Delegation Revalidation         {#revalidation}
 =======================
