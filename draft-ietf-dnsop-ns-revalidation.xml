@@ -64,7 +64,7 @@
       </address>
     </author>
 
-    <date year="2026" month="April" day="21"/>
+    <date year="2026" month="July" day="02"/>
 
     <area>Operations and Management Area</area>
     <workgroup>Domain Name System Operations</workgroup>
@@ -112,16 +112,16 @@ Resolvers should also periodically revalidate the delegation by re-querying the 
 
 <t><xref target="upgrade-ns">Upgrading NS RRset Credibility</xref> recommends that resolvers, when following a referral response from an authoritative server to a child zone, should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.</t>
 
-<t><xref target="upgrade-ns">Upgrading NS RRset Credibility</xref> works most reliably with good quality child NS RRsets, where the name servers referenced in the Rdata of the NS RRset correspond to IP addresses of nameservers which correctly serve the child zone.
-This document considers that both the root, as well as the zones delegated from the root, have good quality child NS RRset. There may be numerous zones further down the DNS delegation hierarchy that may not be competently administered, and may have incorrect or stale authoritative NS and associated address records. As a result they may require a resolver to fallback to data from the delegating side of the zone cut for successful resolution. <xref target="scoped-upgrading"/> describes limiting the upgrading of NS RRset credibility to address this.</t>
+<t><xref target="upgrade-ns">Upgrading NS RRset Credibility</xref> works most reliably with good quality child NS RRsets, where the name servers referenced in the Rdata of the NS RRset correspond to IP addresses of name servers which correctly serve the child zone.
+This document considers that both the root and the zones delegated from the root have good quality child NS RRsets. There may be numerous zones further down the DNS delegation hierarchy that may not be competently administered, and may have incorrect or stale authoritative NS and associated address records. As a result they may require a resolver to fall back to data from the delegating side of the zone cut for successful resolution. <xref target="scoped-upgrading"/> describes limiting the upgrading of NS RRset credibility to address this.</t>
 
 <t>The address records in the additional section from the referral response (as glue) or authoritative NS response that match the names of the NS RRset should similarly be re-queried if they are cached non-authoritatively.
 The authoritative answers from those queries should replace the cached non-authoritative A and AAAA RRsets.
-This is described in (see <xref target="upgrade-addresses">Upgrading A and AAAA RRset Credibility</xref>).</t>
+This is described in <xref target="upgrade-addresses">Upgrading A and AAAA RRset Credibility</xref>.</t>
 
 <t><xref target="strict">Strict and opportunistic revalidation</xref> makes a distinction between strict and opportunistic revalidation.
 Strict revalidation provides <xref target="impact">DNSSEC protection of infrastructure data</xref> with DNSSEC signed infrastructure data and validating resolvers, but for it to work correctly, good quality child NS RRsets are a pre-requisite.
-Opportunistic revalidation allows for fallback to the non-authoritative data returned in the referral responses, but therefore does not provide the same degree of protection as strict revalidation does.</t>
+Opportunistic revalidation allows for fallback to the non-authoritative data returned in the referral responses, and therefore does not provide the same degree of protection as strict revalidation.</t>
 
 <t>Finally, <xref target="revalidation">Delegation Revalidation</xref> recommends that resolvers revalidate the delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.</t>
 
@@ -163,7 +163,7 @@ appear in all capitals, as shown here.</t>
   </dd>
   <dt>Re-delegation:</dt>
   <dd>
-    <t>the process of changing a delegation information to another set of authoritative name servers, potentially under different administrative control</t>
+    <t>the process of changing a delegation to another set of authoritative name servers, potentially under different administrative control</t>
   </dd>
 </dl>
 
@@ -176,15 +176,15 @@ Some of them prefer the parent NS set, some prefer the child, and for others, wh
 
 <t>While this variability is expected to continue in deployed implementations, this document specifies an algorithm that can be adopted by resolvers to achieve several benefits.</t>
 
-<t>This algoritm preferentially and predictably prefers the authoritative NS set at the apex of the child zone, which better comports with the the DNS protocol's data ranking rules. (Note that the proposed redesign of the DNS delegation mechanism in <xref target="I-D.ietf-deleg"/> is expected to fundamentally alter where authoritative delegation information will reside. This document deals with the DNS delegation mechanism as currently deployed.)</t>
+<t>This algorithm predictably prefers the authoritative NS set at the apex of the child zone, which better comports with the DNS protocol's data ranking rules. (Note that the proposed redesign of the DNS delegation mechanism in <xref target="I-D.ietf-deleg"/> is expected to fundamentally alter where authoritative delegation information will reside. This document deals with the DNS delegation mechanism as currently deployed.)</t>
 
 <t>This algorithm also offers several security advantages.
-The mechanisms described in this document help against GHOST domain attacks and a variety of cache poisoning attacks with resolvers that adhere to Sections <xref target="RFC2181" section="5.4.1" sectionFormat="bare">Ranking data</xref> and <xref target="RFC2181" section="6.1" sectionFormat="bare">Zone authority</xref> of <xref target="RFC2181"/>.
-Strictly revalidating referral and authoritative NS RRset responses, enables the resolver to defend itself against query redirection attacks, see <xref target="security">Security and Privacy considerations</xref>.</t>
+The mechanisms described in this document help defend against GHOST domain attacks and a variety of cache poisoning attacks with resolvers that adhere to Sections <xref target="RFC2181" section="5.4.1" sectionFormat="bare">Ranking data</xref> and <xref target="RFC2181" section="6.1" sectionFormat="bare">Zone authority</xref> of <xref target="RFC2181"/>.
+Strictly revalidating referral and authoritative NS RRset responses enables the resolver to defend itself against query redirection attacks, see <xref target="security">Security and Privacy considerations</xref>.</t>
 
 <t>The delegation NS RRset at the bottom of the parent zone and the apex NS RRset in the child zone are unsynchronized in the DNS protocol.
 <xref section="4.2.2" sectionFormat="of" target="RFC1034"/> says "The administrators of both zones should insure that the NS and glue RRs which mark both sides of the cut are consistent and remain so.".
-But for a variety of reasons they could not be <xref target="SOMMESE"/>.
+But for a variety of reasons they may not be <xref target="SOMMESE"/>.
 Officially, a child zone's apex NS RRset is authoritative and thus has a higher cache credibility than the parent's delegation NS RRset, which is non-authoritative (Sections <xref target="RFC2181" section="5.4.1" sectionFormat="bare">Ranking data</xref> and <xref target="RFC2181" section="6.1" sectionFormat="bare">Zone authority</xref> of <xref target="RFC2181"/>).
 Hence the NS RRset "below the zone cut" should immediately replace the parent's delegating NS RRset in cache when an iterative caching DNS resolver crosses a zone boundary.
 However, this can only happen if (1) the resolver receives the authoritative NS RRset in the Authority section of a response from the child zone, which is not mandatory, or (2) if the resolver explicitly issues an NS RRset query to the child zone as part of its iterative resolution algorithm.
@@ -215,13 +215,13 @@ Note that DNSSEC validating resolvers today, when following a secure referral, a
 <t>A validation query consists of a query for the child's apex NS RRset, sent to one of the newly discovered delegation's name servers.
 Normal iterative logic applies to the processing of responses to validation queries, including storing the results in cache, trying the next server on SERVFAIL or timeout, and so on.
 Positive responses to this validation query <bcp14>MAY</bcp14> be cached with an authoritative data ranking.
-Successive queries directed to the same zone <bcp14>SHOULD</bcp14> be directed to the nameservers listed in the child's apex, due to the ranking of this answer.
+Successive queries directed to the same zone <bcp14>SHOULD</bcp14> be sent to the name servers listed in the child's apex, due to the ranking of this answer.
 If the validation query fails, the parent NS RRset <bcp14>SHOULD</bcp14> remain the one with the highest ranking and <bcp14>SHOULD</bcp14> be used for successive queries.</t>
 
 <t>A response to the triggering query to the child may contain the NS RRset in the authority section as well.
 This NS RRset however has a lower trustworthiness than the set from the direct query (<xref section="5.4.1" sectionFormat="of" target="RFC2181"/>), so regardless of the order in which the responses are received, the NS RRset from the answer section from the direct child's apex NS RRset query <bcp14>MAY</bcp14> be stored in the cache eventually.</t>
 
-<t>When a resolver detects that the child's apex NS RRset contains different name servers than the non-authoritative version at the parent side of the zone cut, it <bcp14>MAY</bcp14> report the mismatch using DNS Error Reporting <xref target="RFC9567"/> on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD (See <xref target="IANA"/>).</t>
+<t>When a resolver detects that the child's apex NS RRset contains different name servers than the non-authoritative version at the parent side of the zone cut, it <bcp14>MAY</bcp14> report the mismatch using DNS Error Reporting <xref target="RFC9567"/> on the Report-Channel for the child zone, as well as on the Report-Channel for the parent zone, with an extended DNS error code of TBD (see <xref target="IANA"/>).</t>
 
 <t>A No Data response (see <xref section="2.2" sectionFormat="of" target="RFC2308"/>) for the validating NS query should be treated the same as a failed validating NS query.
 The parent NS RRset <bcp14>SHOULD</bcp14> remain the one with the highest ranking and <bcp14>SHOULD</bcp14> be used for successive queries.
@@ -229,8 +229,8 @@ All resolution failures <bcp14>MUST</bcp14> be cached as directed in <xref targe
 
 </section>
 <section anchor="scoped-upgrading"><name>Limiting upgrading NS Credibility</name>
-<t><xref target="upgrade-ns">Upgrading NS RRset Credibility</xref> works most reliably with good quality child NS RRsets, where the name servers referenced in the Rdata of the NS RRset result in IP addresses which serve the child zone.
-The root and the zones delegated from the root have good quality child NS RRsets. However, because of the less transparently administered further delegations (among others by parties that are perhaps less devoted to DNS administration), some of those further delegations may be sub-optimal for upgrading NS RRset credibility.
+<t><xref target="upgrade-ns">Upgrading NS RRset Credibility</xref> works most reliably with good quality child NS RRsets, where the name servers referenced in the Rdata of the NS RRset correspond to IP addresses of name servers which correctly serve the child zone.
+The root and the zones delegated from the root have good quality child NS RRsets. However, experience has shown that zones further down in the hierarchy are sometimes less competently administered. Hence those zones may be less suitable for upgrading NS RRset credibility, and may require falling back to the parent-side NS RRset, or forgoing revalidation of those zones entirely.
 An implementation <bcp14>MAY</bcp14> limit revalidation to delegations that cross administrative boundaries such as anywhere in ".ip6.arpa" and ".in-addr.arpa" as well as any so-called "public suffix" such as the root zone, top level zones such as ".com" or ".net", and effective top level zones such as ".ad.jp" or ".co.uk".</t>
 
 </section>
@@ -241,7 +241,7 @@ An implementation <bcp14>MAY</bcp14> limit revalidation to delegations that cros
 <t>Additional validation queries for the "glue" address RRs of referral responses (if not already authoritatively present in cache) <bcp14>SHOULD</bcp14> be sent with the validation query for the NS RRset as well.
 Positive responses <bcp14>SHOULD</bcp14> be cached with authoritative data ranking.
 The non-authoritative "glue" <bcp14>MAY</bcp14> be cached with non-authoritative data ranking for fallback purposes.
-Successive queries directed to the same zone <bcp14>SHOULD</bcp14> be directed to the authoritative nameservers denoted in the referral response.</t>
+Successive queries directed to the same zone <bcp14>SHOULD</bcp14> be directed to the authoritative name servers denoted in the referral response.</t>
 
 <t>The names from the NS RRset in a validating NS response may differ from the names from the NS RRset in the referral response.
 Outstanding validation queries for "glue" address RRs that do not match names in a newly discovered authoritative NS RRset may be discarded, or they may be left running to completion.
@@ -251,12 +251,12 @@ They do not need to be re-queried after reception of the authoritative NS RRset 
 
 <t>Validated "glue" may result in unreachable destinations if they are obtained from poorly managed zones with incorrect address records.
 A resolver <bcp14>MAY</bcp14> choose to keep the non-authoritative value for the "glue" next to the preferred authoritative value for fallback purposes.
-Such a resolver <bcp14>MAY</bcp14> choose to fallback to use the non-authoritative value as a last resort, but <bcp14>SHOULD</bcp14> do so only if all other authoritative "glue" led to unreachable destinations as well.</t>
+Such a resolver <bcp14>MAY</bcp14> choose to fall back to using the non-authoritative value as a last resort, but <bcp14>SHOULD</bcp14> do so only if all other authoritative "glue" led to unreachable destinations as well.</t>
 
 </section>
 <section anchor="upgrading-additional-address-from-authoritative-ns-responses"><name>Upgrading additional address from authoritative NS responses</name>
 
-<t>Authoritative responses for a zone's NS RRset at the apex can contain nameserver addresses in the Additional section.
+<t>Authoritative responses for a zone's NS RRset at the apex can contain name server addresses in the Additional section.
 An NS RRset validation response is an example of such a response.
 A priming response is another example of an authoritative zone's NS RRset response <xref target="RFC8109"/>.</t>
 
@@ -274,9 +274,10 @@ In those cases no new validation queries need to be made.</t>
 <section anchor="strictly-revalidating-referrals-and-authoritative-ns-rrset-responses"><name>Strictly revalidating referrals and authoritative NS RRset responses</name>
 
 <t>Resolvers may choose to delay the response to a triggering query until it can be verified that the answer came from a name server listening on an authoritatively acquired address for an authoritatively acquired name.
-This would offer the most trustworthy responses with the least risk for forgery or eavesdropping, however without fallback to lower ranked NS RRsets and addresses, there is no failure mitigation and a failed NS RRset validation query, due to a broken child NS RRset or to malfunctioning child zone's authoritative servers, will then lead to a hard failure to query the referred to child zone.</t>
+This would offer the most trustworthy responses with the least risk of forgery or eavesdropping.
+However, without fallback to lower ranked NS RRsets and addresses, there is no failure mitigation, and a failed NS RRset validation query, due to a broken child NS RRset or to a malfunctioning child zone's authoritative servers, will then lead to a hard failure to query the referred-to child zone.</t>
 
-<t>If the resolver chooses to delay the response, and there are no nameserver names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated nameservers <bcp14>SHOULD</bcp14> be discarded, and this query should be sent again to one of the child's apex nameservers.</t>
+<t>If the resolver chooses to delay the response, and there are no name server names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated name servers <bcp14>SHOULD</bcp14> be discarded, and this query should be sent again to one of the child's apex name servers.</t>
 
 <t>Scoping <strong>strict</strong> upgrading of NS, A and AAAA RRset credibility <bcp14>SHOULD</bcp14> be limited to the root zone and zones delegated from the root zone only (see <xref target="scoped-upgrading"/>).</t>
 
@@ -284,8 +285,8 @@ This would offer the most trustworthy responses with the least risk for forgery 
 <section anchor="opportunistic"><name>Opportunistic revalidating referral and authoritative NS RRset responses</name>
 
 <t>In practice, many implementations are expected to answer the triggering query in advance of the validation query for performance reasons.
-An additional reason is that there are unfortunately a number of nameservers in the field that (incorrectly) fail to properly answer explicit queries for zone apex NS records, and thus the revalidation logic may need to be applied lazily and opportunistically to deal with them.
-In cases where the delegated nameservers respond incorrectly to an NS query, the resolver <bcp14>SHOULD</bcp14> abandon this algorithm for the zone in question and fall back to using only the information from the parent's referral response.</t>
+An additional reason is that there are unfortunately a number of name servers in the field that (incorrectly) fail to properly answer explicit queries for zone apex NS records, and thus the revalidation logic may need to be applied lazily and opportunistically to deal with them.
+In cases where the delegated name servers respond incorrectly to an NS query, the resolver <bcp14>SHOULD</bcp14> abandon this algorithm for the zone in question and fall back to using only the information from the parent's referral response.</t>
 
 <t>Operators <bcp14>MAY</bcp14> limit <em>strict</em> upgrading of NS, A and AAAA RRset credibility to the root zone and zones delegated from the root zone, and perform <em>opportunistic</em> revalidations for further delegations (see <xref target="scoped-upgrading"/>).</t>
 
@@ -309,11 +310,11 @@ What matters is that the cache behave as though this data was removed.</t>
 <t>Since revalidation can discover changes in the shape of the delegation hierarchy it is more efficient to revalidate from the top (root) downward (to the owner name) since an upper level revalidation may obviate lower level revalidations.
 What matters is that the supporting chain of delegations from the root to the owner name be demonstrably valid; further specifics are implementation details.</t>
 
-<t>Revalidation <bcp14>MUST</bcp14> be triggered when delegation meta-data has been cached for a period at most exceeding the delegating NS or DS (if seen) RRset TTL.
+<t>Revalidation <bcp14>MUST</bcp14> be triggered when delegation metadata has been cached for a period at most exceeding the delegating NS or DS (if seen) RRset TTL.
 If the corresponding child zone's apex NS RRset TTL is smaller than the delegating NS RRset TTL, revalidation <bcp14>MUST</bcp14> happen at that interval instead.
 However, resolvers <bcp14>SHOULD</bcp14> impose a sensible minimum TTL floor they are willing to endure to avoid potential computational DoS attacks inflicted by zones with very short TTLs.</t>
 
-<t>In normal operations this meta-data can be quickly revalidated with no further work.
+<t>In normal operations this metadata can be quickly revalidated with no further work.
 However, when re-delegation or take-down occurs, a revalidating cache <bcp14>SHOULD</bcp14> discover this within one delegation TTL period, allowing the rapid expulsion of old data from the cache.</t>
 
 </section>
@@ -345,7 +346,7 @@ The higher up the DNS tree, the more impact such an attack has.
 An attacker controlling a rogue name server for the root has potentially complete control over the entire domain name space and can alter all unsigned parts undetected.</t>
 
 <t>Strictly revalidating referral and authoritative NS RRset responses (see <xref target="strict"/>), enables the resolver to defend itself against the above described attack with DNSSEC signed infrastructure RRsets.
-Unlike cache poisoning defences that leverage increase entropy to protect the transaction, revalidation of NS RRsets and addresses also provides protection against on-path attacks.</t>
+Unlike cache poisoning defences that leverage increased entropy to protect the transaction, revalidation of NS RRsets and addresses also provides protection against on-path attacks.</t>
 
 <t>Since December 6, 2023, the root zone contains a DNSSEC signed cryptographic message digest <xref target="RFC8976"/><xref target="ROOT-ZONEMD"/>, covering all root zone data.
 This includes all non-authoritative data such as the A and AAAA RRsets for the IP addresses of the root server identifiers, as well as the NS RRsets and glue that make up the delegations.
@@ -366,7 +367,7 @@ Otherwise, the operator of a malicious child zone, originally delegated to, but 
 <t>Some resolvers do not adhere to Sections <xref target="RFC2181" section="5.4.1" sectionFormat="bare"/> and <xref target="RFC2181" section="6.1" sectionFormat="bare"/> of <xref target="RFC2181"/>, and only use the non-authoritative parent side NS RRsets and glue returned in referral responses for contacting authoritative name servers <xref target="I-D.fujiwara-dnsop-resolver-update"/>.
 As a consequence, they are not susceptible to many of the cache poisoning attacks enumerated in <xref target="DNS-CACHE-INJECTIONS"/> that are based upon the relative trustworthiness of DNS data.
 Such resolvers are also not susceptible to the GHOST domain attacks <xref target="GHOST1"/>, <xref target="GHOST2"/>.
-Such resolvers will however never benefit from DNSSEC protection of infrastructure RRsets and are susceptible to query redirection attacks.</t>
+Such resolvers will, however, never benefit from DNSSEC protection of infrastructure RRsets and are susceptible to query redirection attacks.</t>
 
 <t>Revalidating referral and authoritative NS RRset responses will induce more traffic from the resolver to the authoritative name servers.
 The traffic increase may be substantial if the address RRsets for the names in the NS RRset's Rdata were provided non-authoritatively (as glue or as additional addresses) and need revalidation too <xref target="REDIRECTED-QUERY-TRAFFIC"/>.
@@ -536,7 +537,7 @@ Resolvers <bcp14>SHOULD</bcp14> take care to limit the amount of work they are w
     </references>
 
 
-<?line 466?>
+<?line 467?>
 
 <section anchor="Acknowledgements"><name>Acknowledgements</name>
 
@@ -552,10 +553,10 @@ The combination of child NS fetch and revalidating the delegation was originally
 <t><strong>Note to the RFC Editor</strong>: please remove this entire appendix before publication.</t>
 
 <t><list style="symbols">
-  <t>The Unbound resolver software has opportunistic revalidating of referral and authoritative NS RRset responses, as described in <xref target="upgrade-ns"/>, <xref target="upgrade-addresses"/> and <xref target="opportunistic"/> in this document, implemented since version 1.1 (released August 29, 2008).
+  <t>The Unbound resolver software supports opportunistic revalidation of referral and authoritative NS RRset responses, as described in <xref target="upgrade-ns"/>, <xref target="upgrade-addresses"/> and <xref target="opportunistic"/> in this document, implemented since version 1.1 (released August 29, 2008).
 It is enabled with a configuration option <spanx style="verb">harden-referral-path: yes</spanx> which is disabled by default.  <vspace blankLines='1'/>
 "Redhat Enterprise Linux has been running Unbound with the <spanx style="verb">harden-referral-path:</spanx> option set to <spanx style="verb">yes</spanx> for years without problems", as mentioned by Paul Wouters during dnsop workgroup session at the IETF 119.</t>
-  <t>The Knot Resolver software revalidates the priming response as part of priming the root zone since version 1.5.1 (released December 12, 2017)</t>
+  <t>The Knot Resolver software revalidates the priming response as part of priming the root zone since version 1.5.1 (released December 12, 2017).</t>
   <t><xref target="revalidation"/> has been implemented in the Unbound resolver since version 1.4.17 (released May 24, 2012).</t>
 </list></t>
 
@@ -565,232 +566,231 @@ It is enabled with a configuration option <spanx style="verb">harden-referral-pa
   </back>
 
 <!-- ##markdown-source:
-H4sIAAAAAAAAA9V96XYbR5bm/3yKbNQPkzoARNKyFnZXd9EkZdGWKJmkrLKr
-65wKZAaANBMZ6IxMUjCtd5kHmV8zL9Z3iTUzQVFVNXNmeI4tIJdYbtzlu0sE
-JpNJ0hRNKQ/TE1nKhWgKVaUX8kaURc5fZpv05PwSrmlV3shaJ2I2q+XNIV3d
-8lKSq6wSK2g1r8W8mRSymU/ySqv1pNKTOnhysn+QJMW6PkybutXNwd7ei72D
-RLezVaE13G82a2jl7PTqZSJqKQ7Tt2tZ05s6FVWevhGVWMiVrJr0CO4ntwsY
-mFqJokrPYQDp5UY3chW8lVzfHiZpOknPqkbWlWwmJzhEugQzon/tXPmim6K5
-F0wTLxy1zVLVRQNXbiRd4Y5lDS3A45mqc77Mjb+DeVTc3/GyKHPXY1tn0jwP
-bzdJJprDVDd5ciOrVuKgF7Vq10T4t+/gK8yyBAojWf+EFJ6qeoFPFc2yncGr
-y/a/Wvm4Q/AkWReH6V8alY1TreqmlnMNnzYr/PDXJBE0HSIR/JemRaUP08tp
-+goboyu8sJfLdgWr7i9D56IqfqNO4LYopZ4rmBLd1NCPhOk82f8mfcMrm17S
-tXH6Ncz3ZalUTU9mRbPB16v0ZS2qrNCZouu1XFDDx0f8mMphEC+e7O99Y763
-VVPDm++ropFAQFgPqVM1T49Wsi4yQU9JJhlT5k8L/DbN1Cqe7Ltp+lPxsQgn
-+060ZXCxM9Wz0/S0rdVajtP30++mYU9rePFPtcxnoq7M8gQ9fZimVzBvtQ66
-+lCUJTBscD3u7fw18Gz6Wsx0RNjLrJAV8A9w13X6ZG8voOXRCkSgzsUqINz+
-3ovn6Z9fxaQ7l81S1iWIlQ7ncEsj+lNVQscl9DutyiSpVL0ijj+kRy9eHu/v
-ff0k/PKN+3Kw/3zff/l677n78hzG4b8833vqv7zYfxJ8eebvvPjmYC/48vTZ
-ISiQah6P52xyMp23vxa3ohZG8dRGqCftGiQheO4G1xUfkh8bfKpYrWsVNnRb
-/FothKhzHTzFbekil5NV0RSsIfw7rPFQdfC17169vbwyVMC/RtQLXLdl06z1
-4ePHt7e3U6C7noAkrpUu2hWyy2O8dLC3f/DYv8jaevTdUukmVHXAT6Cb1DUw
-/8/AIZcNLJvRZGJWypFrwUu4/ZsEny0ffp9+X4hqEd0hpv1+2rsz/P7rre93
-7wy9/wM81X/5h2l8eVvPW7r9zJuv0pNWVP13X027N4b7/dAO9msuEwsc/F0s
-MFkLMGCPF7jmk5zWHHiwVCKX+eSmBcmscY0nZVFd6wncNM/gwJgL2diCaKMx
-UBl9/QxTXZgODtOfXA9AQ+gBZhYZ2QAFoE2+cD18KdP9GRljcPn+/IDl+1ao
-X9sKnhtYhm+nneuD3bcgLjCAb8XwCOLrQy28KarFCv5Lf1kOMv+bae/OUDM/
-FnMwgFva+PFhbfyyVO0gKX95iCQIUIrVPyQOPxaDvf/oegcYMzk+On51Ojk7
-//70+Ors7fnldukopJQf16Wq5RQ/kmiAMWpqkTWPAW62iAEfP9/75tkBAEjX
-imFsB/Y+gMIG3djmG8QGCGGPRbaUgAZ/lRkBxC/l2SNQ/+kPpSwGKHU07d0Z
-pvZGIKAqV1vI3b83zHzZUsgy/SCKvJL1IPeF9y7evr2a/PL2/PTNyXa6l4Vu
-9BTs3kSJOpsCDR+vC1BGiA0e02UHrR8D5b+enMhMrmagrfYODr5+/ny6bFZl
-bz0ulGrS31QlU/e6KEF5VIBFMoLzhzDkplZ5m5E40ShTsPIpYJS0tq9/6WIh
-38r0g9RalrpPoJNpdO/y7Zs3p5en24mzFvW00vPpQt081gD4S9nox+u2Lh/v
-7+0/f/r0+de9mX9YygpgIfoA7MFk6ATA1zQvtFgAmoNhFDc4aSCAIhb1Ghyu
-ZUBpWBNAe5svnf2FmM+BQUAA1AoAg+wT4GI6cG+oqe8KdYOkPJ4CU70B30X0
-G/tuOnh3kHVF0xS/6vR7VV1v4dzercEZKoSvKQwtvYD2ALldA0MWvw7O9L6n
-BiW9BLbGJQHDp2C8g/I+cHMQ3gBt0uMSFmQzhHKGbg4OqapAc4AIQZdqcDzu
-Jov86cnZBeja05PJj+9PL36eXF0cvXx5dnw/KgH3qSL35bGsHmvyqB/PC3Dw
-zP/BwWkzQCJ1oa8BX+RFDboUvoOTVW8moKLn8yIDrLyo8CGQXQYmmlzkCaBx
-MTk4WInNwZOJrKbrfP6H5fT5avns9mYl9LOboidEV6gDuNMUO0Vd7vtNqd/U
-9Av+S7NMuXNWHNh5yp2n2PmXilHfRYuIHnt125v5GQiqdApz0VqUqiquwQPv
-N/fzdPsjgyhIghZN38LkwPDkQ8IEWGjw9qBgYmjjt/TN//6fMOdhwezfG5bw
-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
+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
 
 -->
 
