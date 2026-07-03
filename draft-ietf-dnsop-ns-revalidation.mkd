@@ -355,7 +355,7 @@ However, without fallback to lower ranked NS RRsets and addresses, there is no f
 
 If the resolver chooses to delay the response, and there are no name server names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated name servers SHOULD be discarded, and this query should be sent again to one of the child's apex name servers.
 
-Scoping **strict** upgrading of NS, A and AAAA RRset credibility SHOULD be limited to the root zone and zones delegated from the root zone only (see {{scoped-upgrading}}).
+Resolvers that choose to perform such **strict** upgrading of NS, A and AAAA RRset credibility SHOULD limit it to the root zone and zones delegated from the root zone only (see {{scoped-upgrading}}).
 
 Opportunistic revalidating referral and authoritative NS RRset responses {#opportunistic}
 ------------------------------------------------------------------------
@@ -364,7 +364,7 @@ In practice, many implementations are expected to answer the triggering query in
 An additional reason is that there are unfortunately a number of name servers in the field that (incorrectly) fail to properly answer explicit queries for zone apex NS records, and thus the revalidation logic may need to be applied lazily and opportunistically to deal with them.
 In cases where the delegated name servers respond incorrectly to an NS query, the resolver SHOULD abandon this algorithm for the zone in question and fall back to using only the information from the parent's referral response.
 
-Operators MAY limit *strict* upgrading of NS, A and AAAA RRset credibility to the root zone and zones delegated from the root zone, and perform *opportunistic* revalidations for further delegations (see {{scoped-upgrading}}).
+Following the recommendation in {{strict}} to limit *strict* upgrading to the root zone and zones delegated from the root zone, operators MAY perform *opportunistic* revalidations for further delegations (see {{scoped-upgrading}}).
 
 Delegation Revalidation         {#revalidation}
 =======================
