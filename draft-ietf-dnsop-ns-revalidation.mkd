@@ -382,7 +382,7 @@ Such non-use can be by directed garbage collection or lazy generational garbage 
 What matters is that the cache behave as though this data was removed.
 
 Since revalidation can discover changes in the shape of the delegation hierarchy it is more efficient to revalidate from the top (root) downward (to the owner name) since an upper level revalidation may obviate lower level revalidations.
-What matters is that the supporting chain of delegations from the root to the owner name be demonstrably valid; further specifics are implementation details.
+The essential requirement is that the supporting chain of delegations from the root to the owner name be demonstrably valid; further specifics are implementation details.
 
 Revalidation MUST be triggered no later than when the delegation metadata has been cached for the shortest of the following TTLs: the delegating NS RRset TTL, the DS RRset TTL (if a DS RRset is present), and the child zone's apex NS RRset TTL.
 However, resolvers SHOULD impose a sensible minimum TTL floor they are willing to endure to avoid potential computational DoS attacks inflicted by zones with very short TTLs.
