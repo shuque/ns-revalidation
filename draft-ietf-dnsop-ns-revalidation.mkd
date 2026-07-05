@@ -191,7 +191,7 @@ informative:
 This document describes an optional algorithm for the processing of Name Server (NS) resource record (RR) sets (RRsets) during iterative resolution, and describes the benefits and considerations of using this approach.
 When following a referral response from an authoritative server to a child zone, DNS resolvers should explicitly query the authoritative NS RRset at the apex of the child zone and cache this in preference to the NS RRset on the parent side of the zone cut.
 The (A and AAAA) address RRsets in the additional section from referral responses and authoritative NS answers for the names of the NS RRset, should similarly be re-queried and used to replace the entries with the lower trustworthiness ranking in cache.
-Resolvers should also periodically revalidate the delegation by re-querying the parent zone at the expiration of the TTL of either the parent or child NS RRset, whichever comes first.
+Resolvers should also periodically revalidate the delegation by re-querying the parent zone at the expiration of the shortest TTL among the parent NS RRset, the DS RRset (if present), and the child NS RRset.
 
 --- middle
 
@@ -213,7 +213,7 @@ This is described in {{upgrade-addresses (Upgrading A and AAAA RRset Credibility
 Strict revalidation provides {{impact (DNSSEC protection of infrastructure data)}} with DNSSEC signed infrastructure data and validating resolvers, but for it to work correctly, good quality child NS RRsets are a pre-requisite.
 Opportunistic revalidation allows for fallback to the non-authoritative data returned in the referral responses, and therefore does not provide the same degree of protection as strict revalidation.
 
-Finally, {{revalidation (Delegation Revalidation)}} recommends that resolvers revalidate the delegation by re-querying the parent zone at the expiration of the TTL of the parent side NS RRset.
+Finally, {{revalidation (Delegation Revalidation)}} recommends that resolvers revalidate the delegation by re-querying the parent zone at the expiration of the shortest TTL among the parent-side NS RRset, the DS RRset (if present), and the child NS RRset.
 
 Terminology
 -----------
