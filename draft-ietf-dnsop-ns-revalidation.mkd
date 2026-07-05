@@ -288,7 +288,7 @@ Note that DNSSEC validating resolvers today, when following a secure referral, a
 
 A validation query consists of a query for the child's apex NS RRset, sent to one of the newly discovered delegation's name servers.
 Normal iterative logic applies to the processing of responses to validation queries, including storing the results in cache, trying the next server on SERVFAIL or timeout, and so on.
-Positive responses to this validation query MAY be cached with an authoritative data ranking.
+Positive responses to this validation query SHOULD be cached with an authoritative data ranking.
 Successive queries directed to the same zone SHOULD be sent to the name servers listed in the child's apex, due to the ranking of this answer.
 If the validation query fails, the parent NS RRset SHOULD remain the one with the highest ranking and SHOULD be used for successive queries.
 
