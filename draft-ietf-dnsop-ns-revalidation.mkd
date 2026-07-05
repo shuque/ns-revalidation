@@ -323,13 +323,13 @@ The names from the NS RRset in a validating NS response may differ from the name
 Outstanding validation queries for "glue" address RRs that do not match names in a newly discovered authoritative NS RRset may be discarded, or they may be left running to completion.
 Their result MUST no longer be used in queries for the zone.
 Outstanding validation queries for "glue" address RRs that do match names in the authoritative NS RRset MUST be left running to completion.
-They do not need to be re-queried after reception of the authoritative NS RRset (see {{upgrade-addresses}}).
+They do not need to be re-queried after reception of the authoritative NS RRset (see {{upgrade-additional}}).
 
 Validated "glue" may result in unreachable destinations if they are obtained from poorly managed zones with incorrect address records.
 A resolver MAY choose to keep the non-authoritative value for the "glue" next to the preferred authoritative value for fallback purposes.
 Such a resolver MAY choose to fall back to using the non-authoritative value as a last resort, but SHOULD do so only if all other authoritative "glue" led to unreachable destinations as well.
 
-Upgrading additional address from authoritative NS responses
+Upgrading additional address from authoritative NS responses    {#upgrade-additional}
 ------------------------------------------------------------
 
 Authoritative responses for a zone's NS RRset at the apex can contain name server addresses in the Additional section.
