@@ -418,7 +418,7 @@ Resolvers following referrals from a rogue name server, that do not revalidate t
 The higher up the DNS tree, the more impact such an attack has.
 An attacker controlling a rogue name server for the root has potentially complete control over the entire domain name space and can alter all unsigned parts undetected.
 
-Strictly revalidating referral and authoritative NS RRset responses (see {{strict}}), enables the resolver to defend itself against the above described attack with DNSSEC signed infrastructure RRsets.
+Strictly revalidating referral and authoritative NS RRset responses (see {{strict}}) enables the resolver to defend itself against the above described attack with DNSSEC signed infrastructure RRsets.
 Unlike cache poisoning defences that leverage increased entropy to protect the transaction, revalidation of NS RRsets and addresses also provides protection against on-path attacks.
 
 Since December 6, 2023, the root zone contains a DNSSEC signed cryptographic message digest {{RFC8976}}{{ROOT-ZONEMD}}, covering all root zone data.
