@@ -280,6 +280,10 @@ Otherwise, resolvers that refresh the TTL of a child NS RRset on subsequent quer
 This leads to the second recommendation in this document, "Delegation Revalidation" - Resolvers should record the TTL of the parent's delegating NS RRset, and use it to trigger a revalidation action.
 Attacks exploiting lack of this revalidation have been described in {{GHOST1}}, {{GHOST2}}.
 
+The child-side and parent-side TTLs discussed above act as complementary bounds on how long a resolver relies on cached delegation information.
+The parent-side TTLs bound how long a resolver will honor a delegation after the parent may have removed or re-delegated it, limiting exposure to ghost domain attacks (see {{security}}).
+The child's apex NS RRset TTL provides the complementary bound, letting the child zone dictate how quickly resolvers revalidate the delegation, and thereby how quickly a re-delegation onto other name servers is detected.
+
 Upgrading NS RRset Credibility  {#upgrade-ns}
 ==============================
 
@@ -386,8 +390,7 @@ The essential requirement is that the supporting chain of delegations from the r
 Revalidation MUST be triggered no later than when the delegation metadata has been cached for the shortest of the following TTLs: the delegating NS RRset TTL, the DS RRset TTL (if a DS RRset is present), and the child zone's apex NS RRset TTL.
 However, resolvers SHOULD impose a sensible minimum TTL floor they are willing to endure to avoid potential computational DoS attacks inflicted by zones with very short TTLs.
 
-The delegating NS and DS TTLs bound how long a resolver will honor a delegation after the parent may have removed or re-delegated it, providing protection against ghost domains (see {{security}}) in which a child sets an artificially long apex NS TTL to keep its records resolvable.
-The child's apex NS TTL provides the complementary bound, letting the child zone dictate how quickly resolvers revalidate the delegation and thereby detect re-configuration onto other servers.
+The delegating NS and DS TTLs, and the child's apex NS RRset TTL, serve as complementary bounds on how long the delegation is honored; see {{motivation}} for the rationale.
 
 In normal operations this metadata can be quickly revalidated with no further work.
 However, when re-delegation or take-down occurs, a revalidating cache SHOULD discover this within one delegation TTL period, allowing the rapid expulsion of old data from the cache.
