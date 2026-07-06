@@ -350,7 +350,7 @@ Strictly revalidating referrals and authoritative NS RRset responses
 
 Resolvers may choose to delay the response to a triggering query until it can be verified that the answer came from a name server listening on an authoritatively acquired address for an authoritatively acquired name.
 This would offer the most trustworthy responses with the least risk of forgery or eavesdropping.
-However, without fallback to lower ranked NS RRsets and addresses, there is no failure mitigation, and a failed NS RRset validation query, due to a broken child NS RRset or to a malfunctioning child zone's authoritative servers, will then lead to a hard failure to query the referred-to child zone.
+However, without fallback to lower ranked NS RRsets and addresses, there is no failure mitigation, and a failed NS RRset validation query, due to a broken child NS RRset or to malfunctioning child zone's authoritative servers, will then lead to a hard failure to query the referred-to child zone.
 
 If the resolver chooses to delay the response, and there are no name server names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated name servers SHOULD be discarded, and this query should be sent again to one of the child's apex name servers.
 
