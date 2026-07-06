@@ -316,7 +316,6 @@ Upgrading glue
 Additional validation queries for the "glue" address RRs of referral responses (if not already authoritatively present in cache) SHOULD be sent with the validation query for the NS RRset as well.
 Positive responses SHOULD be cached with authoritative data ranking.
 The non-authoritative "glue" MAY be cached with non-authoritative data ranking for fallback purposes.
-Successive queries directed to the same zone SHOULD be directed to the authoritative name servers denoted in the referral response.
 
 The names from the NS RRset in a validating NS response may differ from the names from the NS RRset in the referral response.
 Outstanding validation queries for "glue" address RRs that do not match names in a newly discovered authoritative NS RRset may be discarded, or they may be left running to completion.
@@ -350,7 +349,7 @@ Strictly revalidating referrals and authoritative NS RRset responses
 
 Resolvers may choose to delay the response to a triggering query until it can be verified that the answer came from a name server listening on an authoritatively acquired address for an authoritatively acquired name.
 This would offer the most trustworthy responses with the least risk of forgery or eavesdropping.
-However, without fallback to lower ranked NS RRsets and addresses, there is no failure mitigation, and a failed NS RRset validation query, due to a broken child NS RRset or to a malfunctioning child zone's authoritative servers, will then lead to a hard failure to query the referred-to child zone.
+However, without fallback to lower ranked NS RRsets and addresses, there is no failure mitigation, and a failed NS RRset validation query, due to a broken child NS RRset or to malfunctioning child zone's authoritative servers, will then lead to a hard failure to query the referred-to child zone.
 
 If the resolver chooses to delay the response, and there are no name server names in common between the child's apex NS RRset and the parent's delegation NS RRset, then any responses received from sending the triggering query to the parent's delegated name servers SHOULD be discarded, and this query should be sent again to one of the child's apex name servers.
 
@@ -419,7 +418,7 @@ Resolvers following referrals from a rogue name server, that do not revalidate t
 The higher up the DNS tree, the more impact such an attack has.
 An attacker controlling a rogue name server for the root has potentially complete control over the entire domain name space and can alter all unsigned parts undetected.
 
-Strictly revalidating referral and authoritative NS RRset responses (see {{strict}}), enables the resolver to defend itself against the above described attack with DNSSEC signed infrastructure RRsets.
+Strictly revalidating referral and authoritative NS RRset responses (see {{strict}}) enables the resolver to defend itself against the above described attack with DNSSEC signed infrastructure RRsets.
 Unlike cache poisoning defences that leverage increased entropy to protect the transaction, revalidation of NS RRsets and addresses also provides protection against on-path attacks.
 
 Since December 6, 2023, the root zone contains a DNSSEC signed cryptographic message digest {{RFC8976}}{{ROOT-ZONEMD}}, covering all root zone data.
